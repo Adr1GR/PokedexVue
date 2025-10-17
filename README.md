@@ -1,6 +1,6 @@
 # Pokedex y Vue 3
 
-Proyecto simple para aprender Vue.
+Proyecto simple para aprender Vue. Además también aprovecho y refino el llevar un proyecto en github (issues, prs, branches).
 
 Objetivo: crear una pokedex a mi gusto. También uso electron para pasarla a escritorio, que llama más.
 
