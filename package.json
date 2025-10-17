@@ -1,0 +1,42 @@
+{
+  "name": "pokedex",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
+    "build:web": "vite build",
+    "build:electron": "electron-builder -l AppImage deb rpm",
+    "build": "npm run build:web && electron-builder"
+  },
+  "build": {
+    "appId": "com.adr1gr.pokedex",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "electron/**"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
+    }
+  },
+  "dependencies": {
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12",
+    "sass-embedded": "^1.93.2",
+    "vite": "^7.1.7",
+    "wait-on": "^9.0.1"
+  }
+}
