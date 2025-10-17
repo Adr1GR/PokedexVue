@@ -1,5 +1,7 @@
-# Vue 3 + Vite
+# Pokedex y Vue 3
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Proyecto simple para aprender Vue.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+Objetivo: crear una pokedex a mi gusto. También uso electron para pasarla a escritorio, que llama más.
+
+La única norma que tengo es no usar IA para ayudarme, ni copilot (que es muy útil una vez ya entiendes que es lo que haces) ni ningún chatbot estilo ChatGPT.
