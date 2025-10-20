@@ -23,7 +23,7 @@
     },
     "files": [
       "dist/**",
-      "electron/**"
+      "src/datastores/electron/**"
     ],
     "asar": true,
     "linux": {
