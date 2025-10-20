@@ -1,9 +1,22 @@
+<template>
+  <div>
+    <PokemonList/>
+  </div>
+</template>
+
 <script setup>
 import PokemonList from './components/PokemonList/PokemonList.vue'
-</script>
+import { usePokemonStore } from '../stores/pokemonStore'
+import { onMounted } from 'vue'
 
-<template>
-  <PokemonList/>
-</template>
+const pokemonStore = usePokemonStore()
+
+onMounted(async () => {
+  if (!pokemonStore.list.length) {
+    await pokemonStore.preload()
+  }
+})
+
+</script>
 
 <style scoped lang="scss" src="./App.scss" />

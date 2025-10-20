@@ -1,2 +1,2 @@
-import { contextBridge } from 'electron';
+const { contextBridge } = require('electron');
 contextBridge.exposeInMainWorld('app', { ping: () => 'pong' });

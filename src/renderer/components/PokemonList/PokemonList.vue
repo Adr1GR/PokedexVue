@@ -1,29 +1,23 @@
 <template>
-    <h1>Pokemon List</h1>
-    <ul id="pokemonList" class="pokemonList">
-    </ul>
+      <div id="pokemon-grid" class="pokemon-grid relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-100 py-6 sm:py-12">
+        <div class="mx-auto max-w-screen-xl px-4 w-full">
+          <h2 class="mb-4 font-bold text-xl text-gray-600">{{header}}</h2>
+          <div class="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            <PokemonCard v-for="pokemon in pokemonStore.list" :key="pokemon.id" :pokemon="pokemon"/>
+          </div>
+        </div>
+      </div>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
+import PokemonCard from '../PokemonCard/PokemonCard.vue';
+import { usePokemonStore } from '../../../stores/pokemonStore';
 
-const pokemons = [
-  { name: "Pikachu", type: "Eléctrico", damage: 55, defense: 40 },
-  { name: "Charizard", type: "Fuego/Volador", damage: 84, defense: 78 },
-  { name: "Bulbasaur", type: "Planta/Veneno", damage: 49, defense: 49 },
-  { name: "Squirtle", type: "Agua", damage: 48, defense: 65 },
-  { name: "Gengar", type: "Fantasma/Veneno", damage: 65, defense: 60 },
-  { name: "Onix", type: "Roca/Tierra", damage: 45, defense: 160 },
-  { name: "Alakazam", type: "Psíquico", damage: 50, defense: 45 },
-  { name: "Machamp", type: "Lucha", damage: 100, defense: 80 },
-  { name: "Snorlax", type: "Normal", damage: 110, defense: 65 },
-  { name: "Dragonite", type: "Dragón/Volador", damage: 134, defense: 95 }
-];
+const header = ref('Pokemon List')
 
-for (let i = 0; i < pokemons.length; i++) {
+const pokemonStore = usePokemonStore()
 
-
-}
 
 </script>
 
