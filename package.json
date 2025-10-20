@@ -1,15 +1,15 @@
 {
   "name": "pokedexvue",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Pokedex de escritorio en Vue + Electron",
   "author": "Adrián <adriangelmotto@gmail.com>",
   "type": "module",
-  "main": "electron/main.js",
+  "main": "src/datastores/electron/main.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
     "build:web": "vite build",
-    "build:electron": "electron-builder -l AppImage",
+    "build:electron": "vite build && electron-builder -l AppImage",
     "build": "npm run build:web && electron-builder -l AppImage",
     "android:build": "npm run build:web && npx cap add android && npx cap copy android && npx cap open android",
     "android:sync": "npm run build:web && npx cap copy android",
@@ -36,8 +36,13 @@
   "dependencies": {
     "@capacitor/android": "^7.4.3",
     "@capacitor/core": "^7.4.3",
-    "bootstrap": "^5.3.8",
-    "vue": "^3.5.22"
+    "@tailwindcss/vite": "^4.1.14",
+    "axios": "^1.12.2",
+    "dotenv": "^17.2.3",
+    "pinia": "^3.0.3",
+    "tailwindcss": "^4.1.14",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
@@ -45,6 +50,7 @@
     "concurrently": "^9.2.1",
     "electron": "^38.3.0",
     "electron-builder": "^26.0.12",
+    "sass-embedded": "^1.93.2",
     "vite": "^7.1.7",
     "wait-on": "^9.0.1"
   }
