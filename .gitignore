@@ -23,6 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
-android
+# Ignorar todo Android excepto los tres archivos indicados
+android/**
+!android/app/
+android/app/**
+!android/app/build.gradle
+!android/app/capacitor.build.gradle
+!android/app/proguard-rules.pro
+
 
 .env
