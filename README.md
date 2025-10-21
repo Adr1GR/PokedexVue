@@ -1,7 +1,7 @@
-# Pokedex y Vue 3
+# Pokedex and Vue 3
 
-Proyecto simple para aprender Vue. Además también aprovecho y refino el llevar un proyecto en github (issues, prs, branches).
+Simple project to learn Vue. I’m also using it to improve how I manage a project on GitHub (issues, PRs, branches).
 
-Objetivo: crear una pokedex a mi gusto. También uso electron para hacer el port a escritorio y capacitor para el de android.
+Goal: create a Pokédex the way I like it. I’m also using Electron for the desktop port and Capacitor for the Android one.
 
-La única norma que tengo es no usar IA para ayudarme, ni copilot (que es muy útil una vez ya entiendes que es lo que haces) ni ningún chatbot estilo ChatGPT.
+The only rule I have is not to use AI for help—neither Copilot (which is very useful once you understand what you’re doing) nor any chatbot like ChatGPT.
