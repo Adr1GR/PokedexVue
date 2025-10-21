@@ -1,0 +1,3 @@
+-keep class com.getcapacitor.** { *; }
+-keep class com.capacitorjs.plugins.** { *; }
+-keepclasseswithmembers class * { @android.webkit.JavascriptInterface <methods>; }
