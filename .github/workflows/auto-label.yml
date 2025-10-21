@@ -1,0 +1,29 @@
+name: Auto label issues by platform
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply label based on platform selection
+        uses: actions-ecosystem/action-add-labels@v1
+        if: contains(github.event.issue.body, 'only desktop')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: only desktop
+
+      - name: Apply label for web
+        uses: actions-ecosystem/action-add-labels@v1
+        if: contains(github.event.issue.body, 'only web')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: only web
+
+      - name: Apply label for mobile
+        uses: actions-ecosystem/action-add-labels@v1
+        if: contains(github.event.issue.body, 'only mobile')
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: only mobile app
