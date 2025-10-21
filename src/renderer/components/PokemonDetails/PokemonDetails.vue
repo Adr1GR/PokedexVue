@@ -4,7 +4,7 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import { usePokemonStore } from '../../../stores/pokemonStore';
+import { usePokemonStore } from '@/renderer/stores/pokemonStore';
 
 const pokemonStore = usePokemonStore()
 
