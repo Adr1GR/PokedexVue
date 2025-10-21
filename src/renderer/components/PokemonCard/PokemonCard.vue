@@ -29,6 +29,7 @@ const imgUrl = (p) =>
   ?? '';
 
 let pokemonName = pokemon.name
+pokemonName = String(pokemonName).charAt(0).toUpperCase() + String(pokemonName).slice(1)
 
 </script>
 
