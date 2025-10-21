@@ -25,10 +25,10 @@ body:
       label: Platform
       description: Select where this feature should be implemented
       options:
+        - all platforms
         - desktop
         - web
         - mobile
-        - all platforms
     validations:
       required: true
 
