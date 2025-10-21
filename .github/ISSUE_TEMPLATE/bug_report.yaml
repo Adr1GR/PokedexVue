@@ -1,7 +1,7 @@
-name: "🐞 Generic Issue"
+name: "Bug report"
 description: Report a bug for Web, Desktop, or Mobile
 title: "[BUG] "
-labels: []
+labels: ["bug"]
 body:
   - type: textarea
     id: description
