@@ -1,5 +1,5 @@
-name: "Bug report"
-description: Report a bug
+name: "🐞 Bug report"
+description: Report a bug for Web, Desktop, or Mobile
 title: "[BUG] "
 labels: ["bug"]
 body:
@@ -7,5 +7,47 @@ body:
     id: description
     attributes:
       label: Description
+      description: Briefly describe the problem
+      placeholder: |
+        Seems like the AppImage build is not rendering the app because the router is not working properly.
     validations:
       required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error
+      description: Paste the error message or log output
+      placeholder: |
+        Not allowed to load local resource: file:///tmp/.mount_PokedeKG8R6i/resources/app.asar/src/datastores/dist/index.html
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Select where the issue occurs
+      options:
+        - all platforms
+        - only desktop
+        - only web
+        - only mobile
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: Fedora Linux
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS Version
+      placeholder: "42"
+
+  - type: input
+    id: app_version
+    attributes:
+      label: App Version
+      placeholder: "0.0.2"

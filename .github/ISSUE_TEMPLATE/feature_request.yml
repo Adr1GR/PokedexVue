@@ -1,4 +1,4 @@
-name: "Feature Request Template"
+name: "✨ Feature request"
 description: Suggest a new feature or improvement for Web, Desktop, or Mobile
 title: "[FEATURE] "
 labels: ["enhancement"]
@@ -7,9 +7,11 @@ body:
     id: summary
     attributes:
       label: Summary
-      description: Briefly describe the feature you’d like to see
+      description: Briefly describe the feature you would like to see
       placeholder: |
         Add support for automatic theme switching between light and dark mode.
+    validations:
+      required: true
 
   - type: textarea
     id: motivation
@@ -17,7 +19,7 @@ body:
       label: Motivation
       description: Explain why this feature would be useful or what problem it solves
       placeholder: |
-        It would improve usability and match the user’s system preferences automatically.
+        It would improve usability and match the user's system preferences automatically.
 
   - type: dropdown
     id: platform
@@ -35,7 +37,7 @@ body:
   - type: textarea
     id: details
     attributes:
-      label: Additional Details
+      label: Additional details
       description: Include any examples, mockups, or related information
       placeholder: |
-        Example: Toggle in settings → “Follow system theme”
+        Example: Toggle in settings → "Follow system theme"
