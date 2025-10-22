@@ -1,23 +1,30 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router";
 
-import PokemonListView from '@/renderer/views/PokemonListView/PokemonListView.vue'
+import PokemonListView from "@/renderer/views/PokemonListView/PokemonListView.vue";
+import PokemonDetailsView from "@/renderer/views/PokemonDetailsView/PokemonDetailsView.vue";
 
 const routes = [
-  { 
-    path: '/', 
+  {
+    path: "/",
     component: PokemonListView,
-    name: 'home',
+    name: "home",
   },
-  { 
-    path: '/list',
+  {
+    path: "/list",
     component: PokemonListView,
-    name: 'pokemon-list',
-  }
-]
+    name: "pokemon-list",
+  },
+  {
+    path: "/pokemon/:id(\\d+)",
+    component: PokemonDetailsView,
+    name: "pokemon-details",
+    props: (route) => ({ pokemonId: Number(route.params.id) }),
+  },
+];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-})
+});
 
-export default router
+export default router;

@@ -23,13 +23,27 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignorar todo Android excepto los tres archivos indicados
-android/**
-!android/app/
-android/app/**
+# Android build output and local configs
+android/.gradle/
+android/app/.gradle/
+android/app/build/
+android/build/
+android/app/intermediates/
+android/app/outputs/
+android/local.properties
+android/.idea/
+android/capacitor-cordova-android-plugins/
+android/app/capacitor-cordova-android-plugins/
+
+# Keep essential Android config
+!android/build.gradle
+!android/settings.gradle
+!android/gradle.properties
 !android/app/build.gradle
 !android/app/capacitor.build.gradle
 !android/app/proguard-rules.pro
+!android/app/src/main/AndroidManifest.xml
+!android/app/src/main/java/**/MainActivity.java
 
-
+# Env
 .env
