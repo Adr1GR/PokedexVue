@@ -1,11 +1,13 @@
 {
   "name": "pokedexvue",
+  "productName": "Pokedex Vue",
   "private": true,
-  "version": "0.0.2",
-  "description": "Pokedex de escritorio en Vue + Electron",
+  "version": "0.0.3",
+  "description": "A practice Vue project",
   "author": "Adrián <adriangelmotto@gmail.com>",
   "type": "module",
   "main": "src/datastores/electron/main.js",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
     "build:web": "vite build",
