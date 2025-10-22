@@ -1,4 +1,4 @@
-# Pokedex and Vue 3
+# Pokedex and Vue
 
 Simple project to learn Vue. I’m also using it to improve how I manage a project on GitHub (issues, PRs, branches).
 
