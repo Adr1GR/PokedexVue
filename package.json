@@ -6,7 +6,7 @@
   "description": "A practice Vue project",
   "author": "Adrián <adriangelmotto@gmail.com>",
   "type": "module",
-  "main": "src/datastores/electron/main.js",
+  "main": "src/electron/main.js",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
@@ -26,7 +26,7 @@
     },
     "files": [
       "dist/**",
-      "src/datastores/electron/**"
+      "src/electron/**"
     ],
     "asar": true,
     "linux": {

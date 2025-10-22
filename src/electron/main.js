@@ -11,12 +11,8 @@ const DEV_URL =
   process.env.ELECTRON_RENDERER_URL ||
   "http://localhost:5173/";
 
-// evita instancias duplicadas
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-}
+if (!app.requestSingleInstanceLock()) app.quit();
 
-/** Crea la ventana principal */
 function createWin() {
   const preloadPath = existsSync(join(__dirname, "preload.cjs"))
     ? join(__dirname, "preload.cjs")
@@ -34,24 +30,19 @@ function createWin() {
     },
   });
 
-  // seguridad básica
   win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-
-  // ayuda a depurar
   win.webContents.on("render-process-gone", (_e, details) => {
     console.error("render-process-gone:", details);
   });
-
   win.once("ready-to-show", () => win.show());
 
   const loadDist = () => {
-    const distDir = join(__dirname, "../dist");
-    win.loadFile(join(distDir, "index.html")); // requiere base:'./' en vite.config.js
+    const indexPath = join(app.getAppPath(), "dist", "index.html");
+    win.loadFile(indexPath);  // seguro tanto en dev como AppImage
   };
 
   if (isDev) {
     let attemptedDev = true;
-    // fallback automático si no hay Vite corriendo
     win.webContents.once("did-fail-load", () => {
       if (attemptedDev) {
         attemptedDev = false;
@@ -59,28 +50,20 @@ function createWin() {
       }
     });
     win.loadURL(DEV_URL).catch(() => loadDist());
-    // win.webContents.openDevTools({ mode: 'detach' })
   } else {
     loadDist();
   }
 }
 
-// hot-reload simple en dev para renderer y preload
 async function setupDevReload() {
   if (!isDev) return;
   try {
     const { default: chokidar } = await import("chokidar");
     const watcher = chokidar.watch(
-      [
-        join(__dirname, "../src"),
-        join(__dirname, "preload.js"),
-        join(__dirname, "preload.cjs"),
-      ],
+      [join(__dirname, "../src"), join(__dirname, "preload.js"), join(__dirname, "preload.cjs")],
       { ignoreInitial: true }
     );
-
     watcher.on("change", async (file) => {
-      console.log("[dev watch] changed:", file);
       if (file.endsWith("preload.js") || file.endsWith("preload.cjs")) {
         app.relaunch();
         app.exit(0);
@@ -113,10 +96,5 @@ app.on("second-instance", () => {
   }
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
-
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWin();
-});
+app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
+app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWin(); });
