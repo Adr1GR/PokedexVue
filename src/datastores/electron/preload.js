@@ -1,2 +1,2 @@
-const { contextBridge } = require('electron');
-contextBridge.exposeInMainWorld('app', { ping: () => 'pong' });
+const { contextBridge } = require("electron");
+contextBridge.exposeInMainWorld("app", { ping: () => "pong" });

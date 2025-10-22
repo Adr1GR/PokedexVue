@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PokedexVue</string>
+    <string name="title_activity_main">PokedexVue</string>
+    <string name="package_name">com.adr1gr.pokedexvue</string>
+    <string name="custom_url_scheme">com.adr1gr.pokedexvue</string>
+</resources>
