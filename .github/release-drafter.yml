@@ -1,0 +1,12 @@
+name-template: "v$NEXT_PATCH_VERSION"
+tag-template: "v$NEXT_PATCH_VERSION"
+categories:
+  - title: "Changelog"
+    labels:
+      - "feature"
+      - "bug"
+      - "enhancement"
+change-template: "- $TITLE [PR #$NUMBER] by @$AUTHOR"
+template: |
+  ## Changelog
+  $CHANGES
