@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="mb-4 font-bold text-xl text-gray-600">{{ header }}</h2>
+    <h1 class="mb-4 font-bold text-2xl text-gray-700">{{ header }}</h1>
     <PokemonList />
   </div>
 </template>
