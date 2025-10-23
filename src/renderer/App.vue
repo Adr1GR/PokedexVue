@@ -1,10 +1,9 @@
 <template>
   <div>
-    <p><strong>Current route path:</strong> {{ $route.fullPath }}</p>
     <NavBar />
     <div v-if="pokemonStore.loading">Loading...</div>
     <div v-else>
-      <RouterView class="p-4"/>
+      <RouterView class="p-4 mb-8 sm:mb-0"/>
     </div>
   </div>
 </template>
