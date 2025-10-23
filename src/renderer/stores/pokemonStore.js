@@ -11,7 +11,7 @@ const SPRITES_BASE = (
 const idFromUrl = (url) => Number(url.match(/\/pokemon\/(\d+)\/?$/)[1]);
 const artworkUrl = (id) =>
   `${SPRITES_BASE}pokemon/other/official-artwork/${id}.png`;
-const TTL_MS = 1000 * 60 * 60 * 24; // 24h
+const TTL_MS = 1000 * 60 * 60 * 48; // 48h
 
 export const usePokemonStore = defineStore("pokemon", {
   state: () => ({

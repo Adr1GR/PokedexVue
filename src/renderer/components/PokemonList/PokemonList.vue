@@ -1,9 +1,9 @@
 <template>
   <div
     id="pokemon-grid"
-    class="pokemon-grid relative min-h-screen flex-col justify-center overflow-hidden bg-gray-100 py-6 sm:py-12"
+    class="relative min-h-screen flex-col justify-center overflow-hidden py-6 sm:py-12"
   >
-    <div class="mx-auto max-w-screen-xl w-full">
+    <div class="">
       <div
         class="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
       >
