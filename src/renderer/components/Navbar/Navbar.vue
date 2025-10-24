@@ -22,7 +22,6 @@
       class="flex-1 flex flex-col items-center justify-center"
       href="https://github.com/Adr1GR/PokedexVue/releases/latest"
       target="_blank"
-      
     >
       <span class="text-sm">Downloads</span>
     </a>

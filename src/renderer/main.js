@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, onMounted } from "vue";
 import { createPinia } from "pinia";
 import persist from 'pinia-plugin-persistedstate'
 import "@/renderer/style.scss";
