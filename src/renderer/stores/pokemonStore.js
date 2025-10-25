@@ -63,7 +63,7 @@ export const usePokemonStore = defineStore("pokemon", {
     },
 
     async loadPokemonListFromStorage() {
-      this.resetState()
+      this.resetState();
       if (!this.pokemonList || this.pokemonList.length <= 0) return false;
 
       for (const p of this.pokemonList) {
@@ -118,7 +118,7 @@ export const usePokemonStore = defineStore("pokemon", {
     },
 
     async loadPokemonByIdFromStorage(id) {
-      this.resetState()
+      this.resetState();
       if (!Number.isFinite(id)) return null;
 
       const entry = this.pokemonDetails[id];

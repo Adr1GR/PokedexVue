@@ -8,7 +8,7 @@
   >
     <div
       class="h-44 sm:h-80 overflow-hidden flex items-center justify-center border border-gray-300 rounded-md"
-      :style="{ backgroundColor: pokemonStore.pokemonList[pokemon.id - 1].dominantColor }"
+      :style="{ backgroundColor: pokemon.dominantColor || '#f5f5f5' }"
     >
       <img
         :src="pokemon.artwork"
