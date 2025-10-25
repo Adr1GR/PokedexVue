@@ -119,34 +119,27 @@ export const usePokemonStore = defineStore("pokemon", {
             throw new Error("Malformed response from API");
           }
 
-          const items = await Promise.all(
-            data.results.map(async (r) => {
-              const id = idFromUrl(r.url);
-              const artwork = id ? getArtworkUrl(id) : null;
+          this.list = data.results.map((r) => {
+            const id = idFromUrl(r.url);
+            const artwork = id ? getArtworkUrl(id) : null;
+            return { id, name: r.name, artwork, dominantColor: DEFAULT_COLOR };
+          });
 
-              let dominantColor = DEFAULT_COLOR;
-              if (artwork) {
+          if (typeof window !== "undefined") {
+            for (const p of this.list) {
+              if (p.artwork) {
                 try {
-                  dominantColor = await getDominantColor(
-                    artwork,
+                  p.dominantColor = await getDominantColor(
+                    p.artwork,
                     "LightVibrant"
                   );
                 } catch (err) {
-                  console.error("getDominantColor failed for", artwork, err);
-                  dominantColor = DEFAULT_COLOR;
+                  console.error("getDominantColor failed for", p.artwork, err);
+                  p.dominantColor = DEFAULT_COLOR;
                 }
               }
-
-              return {
-                id,
-                name: r.name,
-                artwork,
-                dominantColor,
-              };
-            })
-          );
-
-          this.list = items;
+            }
+          }
         } catch (e) {
           this.setError(e);
         } finally {
