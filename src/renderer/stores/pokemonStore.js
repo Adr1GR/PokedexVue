@@ -3,8 +3,11 @@ import { isUrlReachable } from "@/renderer/helpers/connectionHelper";
 import { showErrorPopup } from "@/renderer/helpers/errorHelper";
 import { getDominantColor } from "@/renderer/helpers/colorHelper";
 
-const API_BASE = import.meta.env.VITE_POKEAPI_BASE_URL;
-const SPRITES_BASE = import.meta.env.VITE_POKESPRITES_BASE_URL;
+const API_BASE =
+  import.meta.env.VITE_POKEAPI_BASE_URL ?? "https://pokeapi.co/api/v2/";
+const SPRITES_BASE =
+  import.meta.env.VITE_POKESPRITES_BASE_URL ??
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/";
 
 const DEFAULT_COLOR = "rgb(245,245,245)";
 const TTL_MS = 1000 * 60 * 60 * 24 * 7; // last number are days
