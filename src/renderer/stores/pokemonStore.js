@@ -109,12 +109,13 @@ export const usePokemonStore = defineStore("pokemon", {
           const res = await fetch(
             `${API_BASE}pokemon?limit=${limit}&offset=${offset}`
           );
+          console.log("Fetch response status:", res.status, res);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
+          console.log("Data fetched:", data);
           if (!data || !Array.isArray(data.results)) {
             throw new Error("Malformed response from API");
           }
-
           this.list = data.results.map((r) => {
             const id = idFromUrl(r.url);
             const artwork = id ? getArtworkUrl(id) : null;
@@ -127,6 +128,7 @@ export const usePokemonStore = defineStore("pokemon", {
               : DEFAULT_COLOR;
           }
         } catch (e) {
+          console.error("Preload error:", e);
           this.setError(e);
         } finally {
           this.preloaded = true;
