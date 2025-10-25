@@ -50,11 +50,6 @@ export function getPokemonTypeColor(name) {
  */
 export function getDominantColor(imageSrc, tone = "average", sampleSize = 10) {
   return new Promise((resolve) => {
-    if (typeof window === "undefined") {
-      resolve("rgb(245,245,245)");
-      return;
-    }
-
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = imageSrc;
