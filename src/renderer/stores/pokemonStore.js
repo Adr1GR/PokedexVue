@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { isUrlReachable } from "@/renderer/helpers/connectionHelper";
 import { showErrorPopup } from "@/renderer/helpers/errorHelper";
+import { getDominantColor } from "@/renderer/helpers/colorHelper";
 
 const API_BASE = import.meta.env
   .VITE_POKEAPI_BASE_URL; /*  ?? "https://pokeapi.co/api/v2/"
@@ -9,15 +10,17 @@ const SPRITES_BASE = import.meta.env.VITE_POKESPRITES_BASE_URL; /*  ??
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/"
 ).replace(/\/?$/, "/" */
 
+const DEFAULT_COLOR = "rgb(245,245,245)";
+const TTL_MS = 1000 * 60 * 60 * 24 * 7; // last number are days
+
 const idFromUrl = (url) => {
   if (!url || typeof url !== "string") return null;
   const m = url.match(/\/pokemon\/(\d+)\/?$/);
   return m ? Number(m[1]) : null;
 };
 
-const artworkUrl = (id) =>
+const getArtworkUrl = (id) =>
   `${SPRITES_BASE}pokemon/other/official-artwork/${id}.png`;
-const TTL_MS = 1000 * 60 * 60 * 48; // 48h
 
 export const usePokemonStore = defineStore("pokemon", {
   state: () => ({
@@ -32,7 +35,7 @@ export const usePokemonStore = defineStore("pokemon", {
     total: (s) => s.list.length,
   },
   persist: {
-    key: "pokemon-store-v1",
+    key: "pokemon-store-v2",
     paths: ["list", "cache"],
   },
   actions: {
@@ -91,13 +94,11 @@ export const usePokemonStore = defineStore("pokemon", {
     },
 
     async preload(limit = 20, offset = 0) {
-      // si ya hemos preloadado, salir
       if (this.preloaded) return;
 
       this.setLoadingTrue();
       this.clearError();
 
-      // si ya hay lista persistida, marcar preloaded y salir rápido
       if (this.list.length > 0) {
         this.preloaded = true;
         this.setLoadingFalse();
@@ -105,7 +106,6 @@ export const usePokemonStore = defineStore("pokemon", {
         return;
       }
 
-      // comprobar reachability (la función isUrlReachable devuelve bool)
       this.reachable = await isUrlReachable(API_BASE + "pokemon?limit=1", 2500);
 
       if (this.reachable) {
@@ -118,10 +118,35 @@ export const usePokemonStore = defineStore("pokemon", {
           if (!data || !Array.isArray(data.results)) {
             throw new Error("Malformed response from API");
           }
-          this.list = data.results.map((r) => {
-            const id = idFromUrl(r.url);
-            return { id, name: r.name, artwork: artworkUrl(id) };
-          });
+
+          const items = await Promise.all(
+            data.results.map(async (r) => {
+              const id = idFromUrl(r.url);
+              const artwork = id ? getArtworkUrl(id) : null;
+
+              let dominantColor = DEFAULT_COLOR;
+              if (artwork) {
+                try {
+                  dominantColor = await getDominantColor(
+                    artwork,
+                    "LightVibrant"
+                  );
+                } catch (err) {
+                  console.error("getDominantColor failed for", artwork, err);
+                  dominantColor = DEFAULT_COLOR;
+                }
+              }
+
+              return {
+                id,
+                name: r.name,
+                artwork,
+                dominantColor,
+              };
+            })
+          );
+
+          this.list = items;
         } catch (e) {
           this.setError(e);
         } finally {
@@ -129,9 +154,8 @@ export const usePokemonStore = defineStore("pokemon", {
           this.setLoadingFalse();
         }
       } else {
-        // sólo mostrar popup cuando no es reachable
         showErrorPopup("Preload isUrlReachable FALSE", "from preload()");
-        this.preloaded = true; // intent terminado aunque sin datos
+        this.preloaded = true;
         this.setLoadingFalse();
       }
     },
@@ -165,7 +189,7 @@ export const usePokemonStore = defineStore("pokemon", {
           stats: Array.isArray(data.stats)
             ? data.stats.map((s) => ({ name: s.stat.name, base: s.base_stat }))
             : [],
-          artwork: artworkUrl(data.id),
+          artwork: getArtworkUrl(data.id),
         };
         return this._save(id, pokemon);
       } catch (e) {

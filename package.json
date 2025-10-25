@@ -43,6 +43,7 @@
     "@tailwindcss/vite": "^4.1.14",
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
+    "node-vibrant": "^4.0.3",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.5.0",
     "tailwindcss": "^4.1.14",

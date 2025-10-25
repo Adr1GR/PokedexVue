@@ -1,12 +1,12 @@
 <template>
   <div>
     <div v-if="pokemonStore.loading && !pokemon">Loading...</div>
-    <PokemonDetails v-else-if="pokemon" :pokemon="pokemon" />
+    <PokemonDetails v-else-if="pokemon" :pokemon="pokemon"/>
   </div>
 </template>
 
 <script setup>
-import { computed, watchEffect, watch } from "vue";
+import { computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { usePokemonStore } from "@/renderer/stores/pokemonStore";
 import { showErrorPopup } from "@/renderer/helpers/errorHelper";
