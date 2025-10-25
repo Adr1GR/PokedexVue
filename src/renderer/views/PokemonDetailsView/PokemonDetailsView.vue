@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="pokemonStore.loading && !pokemon">Loading...</div>
+    <LoadingPokeball v-if="pokemonStore.loading && !pokemon" />
     <PokemonDetails v-else-if="pokemon" :pokemon="pokemon" />
   </div>
 </template>
@@ -11,6 +11,7 @@ import { useRoute, useRouter } from "vue-router";
 import { usePokemonStore } from "@/renderer/stores/pokemonStore";
 import { showErrorPopup } from "@/renderer/helpers/errorHelper";
 import PokemonDetails from "@/renderer/components/PokemonDetails/PokemonDetails.vue";
+import LoadingPokeball from "@/renderer/components/LoadingPokeball/LoadingPokeball.vue"
 
 const route = useRoute();
 const router = useRouter();
