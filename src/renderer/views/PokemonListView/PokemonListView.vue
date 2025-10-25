@@ -3,7 +3,7 @@
     <h1 class="mb-4 font-bold text-2xl text-gray-700">{{ header }}</h1>
 
     <!--TODO: Load spinner -->
-    <div v-if="loading && !showError" class="p-4">Loading...</div>
+    <LoadingPokeball v-if="loading && !showError" />
 
     <!-- Render cache -->
     <div v-else class="relative">
@@ -35,10 +35,10 @@
 </template>
 
 <script setup>
-import PokemonList from "@/renderer/components/PokemonList/PokemonList.vue";
-
 import { onMounted, computed } from "vue";
 import { usePokemonStore } from "@/renderer/stores/pokemonStore";
+import PokemonList from "@/renderer/components/PokemonList/PokemonList.vue";
+import LoadingPokeball from "@/renderer/components/LoadingPokeball/LoadingPokeball.vue";
 
 const header = "Pokédex";
 const pokemonStore = usePokemonStore();
