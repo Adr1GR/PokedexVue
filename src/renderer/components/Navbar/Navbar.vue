@@ -1,13 +1,13 @@
 <template>
   <!-- Navbar móvil -->
   <nav
-    class="fixed bottom-0 left-0 w-full h-14 sm:hidden z-[9999] bg-red-600 text-white flex items-center"
+    class="secondary-background-color fixed bottom-0 left-0 w-full h-14 sm:hidden z-[9999] flex items-center bg-primary/80 backdrop-blur-md font-bold"
   >
     <RouterLink
       class="flex-1 flex flex-col items-center justify-center"
       :to="{ name: 'pokemon-list' }"
     >
-      <span class="text-sm">Home</span>
+      <span class="navbar-links">Home</span>
     </RouterLink>
 
     <a
@@ -15,7 +15,7 @@
       href="https://github.com/Adr1GR/PokedexVue"
       target="_blank"
     >
-      <span class="text-sm">Source</span>
+      <span class="navbar-links">Source</span>
     </a>
 
     <a
@@ -23,33 +23,36 @@
       href="https://github.com/Adr1GR/PokedexVue/releases/latest"
       target="_blank"
     >
-      <span class="text-sm">Downloads</span>
+      <span class="navbar-links">Downloads</span>
     </a>
   </nav>
 
   <!-- Navbar escritorio -->
   <nav
     id="navbar"
-    class="hidden sm:flex bg-red-600 w-full items-center justify-between px-4 py-2 text-white shadow-xs shadow-red-950"
+    class="secondary-background-color hidden sm:flex w-full items-center justify-between px-4 py-2 font-bold"
   >
     <RouterLink
-      class="py-2 px-4 leading-normal no-underline hover:bg-red-500"
+      class="navbar-links py-2 px-4"
       :to="{ name: 'pokemon-list' }"
-      >PokedexVue</RouterLink
     >
+      PokedexVue
+    </RouterLink>
     <div class="flex space-x-4">
       <a
-        class="py-2 px-4 leading-normal no-underline hover:bg-red-500"
+        class="navbar-links py-2 px-4"
         href="https://github.com/Adr1GR/PokedexVue"
         target="_blank"
-        >Source</a
       >
+        Source
+      </a>
       <a
-        class="py-2 px-4 leading-normal no-underline hover:bg-red-500"
+        class="navbar-links py-2 px-4"
         href="https://github.com/Adr1GR/PokedexVue/releases/latest"
         target="_blank"
-        >Downloads</a
       >
+        Downloads
+      </a>
     </div>
   </nav>
 </template>
@@ -57,3 +60,5 @@
 <script setup>
 import { RouterLink } from "vue-router";
 </script>
+
+<style scoped lang="scss" src="./Navbar.scss" />

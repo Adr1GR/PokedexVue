@@ -2,7 +2,7 @@
   <div class="main-container">
     <NavBar />
     <RouterView
-      class="mx-auto max-w-screen-xl w-full p-4 mb-8 sm:mb-0 mt-0 sm:mt-8"
+      class="mx-auto md:max-w-screen-2xl mb-24 sm:mb-14 px-4 2xl:px-0 py-6"
     />
   </div>
 </template>

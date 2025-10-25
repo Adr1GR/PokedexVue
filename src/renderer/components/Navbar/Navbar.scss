@@ -1,0 +1,8 @@
+@use '../../variables.scss' as vars;
+
+.navbar-links {
+  color: vars.$secondary-text-color;
+  text-decoration-line: none;
+  --tw-leading: 1.5;
+  line-height: 1.5;
+}

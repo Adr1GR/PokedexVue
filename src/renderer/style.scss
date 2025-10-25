@@ -1,3 +1,63 @@
+// Importa variables con @use y un prefijo
+@use './variables.scss' as vars;
+
+@font-face {
+  font-family: 'SimplyRounded';
+  src: url('../assets/fonts/SimplyRounded.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Colores */
+.primary-text-color {
+  color: vars.$primary-text-color;
+}
+
+.primary-background-color {
+  background-color: vars.$primary-background-color;
+}
+
+.secondary-text-color {
+  color: vars.$secondary-text-color;
+}
+
+.secondary-background-color {
+  background-color: vars.$secondary-background-color;
+}
+
+.title {
+  color: vars.$primary-text-color;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
+}
+
+.medium-title {
+  color: vars.$primary-text-color;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+}
+
+.small-title {
+  color: vars.$primary-text-color;
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 0.4rem;
+}
+
+.pokeball-spin-button {
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 #__error_popup__ {
   position: fixed;
   left: 50%;

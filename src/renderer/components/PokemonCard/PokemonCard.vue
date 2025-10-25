@@ -1,14 +1,22 @@
 <template>
   <div class="hover:-translate-y-1 duration-300" ref="container">
     <div
-      :style="{ backgroundColor: pokemon.dominantColor }"
-      class="relative flex flex-col overflow-hidden hover:shadow-lg max-w-sm border border-gray-300 rounded-md"
+      :style="{
+        background: `linear-gradient(135deg, rgb(245,245,245) 50%, ${pokemon.dominantColor} 50%)`,
+        boxShadow: `0 0 12px 1.5px ${pokemon.dominantColor}`,
+        borderColor: pokemon.dominantColor,
+      }"
+      class="relative flex flex-col overflow-hidden hover:shadow-xl max-w-sm border rounded-md transition-all duration-200"
     >
       <RouterLink
         class="z-20 absolute h-full w-full top-0 left-0"
         :to="{ name: 'pokemon-details', params: { id: pokemon.id } }"
       />
-      <div class="h-44 overflow-hidden flex items-center justify-center">
+
+      <!-- Imagen con overlay de nombre -->
+      <div
+        class="relative h-44 overflow-hidden flex items-center justify-center"
+      >
         <img
           v-if="visible && pokemon"
           :src="pokemon.artwork"
@@ -17,16 +25,26 @@
           loading="lazy"
           crossorigin="anonymous"
         />
-      </div>
-      <div
-        :class="[
-          'px-3 py-0.5 rounded-b-md',
-          shouldUseLightText(pokemon.dominantColor)
-            ? 'text-white'
-            : 'text-black',
-        ]"
-      >
-        <h3 class="text-md capitalize">{{ pokemon.name }}</h3>
+
+        <!-- ID arriba a la izquierda -->
+        <div
+          class="pokemon-card-id absolute top-0 left-0 text-left pl-2 pt-1"
+          :style="{ color: pokemon.dominantColor || '#1f1f20' }"
+        >
+          #{{ pokemon.id }}
+        </div>
+
+        <!-- Nombre abajo a la derecha -->
+        <div
+          class="absolute bottom-0 right-0 text-right pr-2 py-1"
+          :class="
+            shouldUseLightText(pokemon.dominantColor)
+              ? 'text-white'
+              : 'text-black'
+          "
+        >
+          <h3 class="pokemon-card-name capitalize">{{ pokemon.name }}</h3>
+        </div>
       </div>
     </div>
   </div>

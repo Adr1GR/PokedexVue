@@ -3,7 +3,6 @@ import {
   hasInternetConnection,
   canFetchPokemon,
 } from "@/renderer/helpers/connectionHelper";
-import { showErrorPopup } from "@/renderer/helpers/errorHelper";
 import { getDominantColor } from "@/renderer/helpers/colorHelper";
 
 const API_BASE =
@@ -39,6 +38,11 @@ export const usePokemonStore = defineStore("pokemon", {
     paths: ["pokemonList", "pokemonDetails"],
   },
   actions: {
+    _savePokemonList(data) {
+      if (!Array.isArray(data) || data.length === 0) return;
+      this.pokemonList.push(...data);
+    },
+
     _isStalePokemonDetails(id) {
       const e = this.pokemonDetails[id];
       if (!e) return true;
@@ -97,17 +101,23 @@ export const usePokemonStore = defineStore("pokemon", {
           throw new Error("Malformed response from API");
         }
 
-        this.pokemonList = await Promise.all(
+        const newPokemonListLoaded = await Promise.all(
           data.results.map(async (r) => {
             const id = idFromUrl(r.url);
             const artwork = id ? getArtworkUrl(id) : null;
-            const dominantColor = artwork
-              ? await getDominantColor(artwork, "light")
-              : DEFAULT_COLOR;
+            let dominantColor = DEFAULT_COLOR;
+            if (artwork) {
+              try {
+                dominantColor = await getDominantColor(artwork, "light");
+              } catch {
+                dominantColor = DEFAULT_COLOR;
+              }
+            }
             return { id, name: r.name, artwork, dominantColor };
           })
         );
 
+        this._savePokemonList(newPokemonListLoaded);
         return true;
       } catch (e) {
         this.setError(e);
