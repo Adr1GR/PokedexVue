@@ -7,7 +7,7 @@ export function showErrorPopup(e, additionalText) {
   let existing = document.getElementById(ID);
   if (existing) {
     clearTimeout(existing._hideTimer);
-    existing.querySelector(".#__content, .error-popup__content")?.textContent; // noop for linter if needed
+    existing.querySelector(".error-popup__content")?.textContent;
     existing._content.textContent = text;
     existing._copyHint.textContent = "Click to copy";
     existing.classList.remove("error-popup--hidden");

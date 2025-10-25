@@ -1,5 +1,5 @@
 <template>
-  <div class="hover:-translate-y-1 duration-300">
+  <div class="hover:-translate-y-1 duration-300" ref="container">
     <div
       :style="{ backgroundColor: pokemon.dominantColor }"
       class="relative flex flex-col overflow-hidden hover:shadow-lg max-w-sm border border-gray-300 rounded-md"
@@ -10,12 +10,12 @@
       />
       <div class="h-44 overflow-hidden flex items-center justify-center">
         <img
-          v-if="pokemon"
+          v-if="visible && pokemon"
           :src="pokemon.artwork"
-          :alt="pokemon?.name"
+          :alt="pokemon.name"
+          class="w-full h-full object-contain"
           loading="lazy"
           crossorigin="anonymous"
-          class="w-full h-full object-contain"
         />
       </div>
       <div
@@ -35,8 +35,29 @@
 <script setup>
 import { RouterLink } from "vue-router";
 import { shouldUseLightText } from "@/renderer/helpers/colorHelper";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 const { pokemon } = defineProps({ pokemon: { type: Object, required: true } });
+const container = ref(null);
+const visible = ref(false);
+let observer;
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        visible.value = true;
+        observer.disconnect();
+      }
+    },
+    { threshold: 0.1 }
+  );
+  if (container.value) observer.observe(container.value);
+});
+
+onBeforeUnmount(() => {
+  observer?.disconnect();
+});
 </script>
 
 <style scoped lang="scss" src="./PokemonCard.scss" />
