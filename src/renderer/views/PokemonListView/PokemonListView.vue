@@ -3,9 +3,7 @@
     <h1 class="mb-4 font-bold text-2xl text-gray-700">{{ header }}</h1>
 
     <!--TODO: Load spinner -->
-    <div v-if="pokemonStore.loading && !pokemonStore.hasError" class="p-4">
-      Loading...
-    </div>
+    <div v-if="loading && !showError" class="p-4">Loading...</div>
 
     <!-- Render cache -->
     <div v-else class="relative">
@@ -14,10 +12,7 @@
 
     <!-- Error Banner -->
     <div
-      v-if="
-        pokemonStore.preloaded == false &&
-        pokemonStore.list.length <= 0
-      "
+      v-if="showError"
       class="fixed inset-x-0 bottom-20 sm:bottom-80 z-50 bg-red-600 text-white p-4 flex items-center justify-between mx-0 xs:mx-20 sm:mx-40 md:mx-60 lg:mx-80 xl:mx-100"
       role="alert"
     >
@@ -42,30 +37,29 @@
 <script setup>
 import PokemonList from "@/renderer/components/PokemonList/PokemonList.vue";
 
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { usePokemonStore } from "@/renderer/stores/pokemonStore";
-import { showErrorPopup } from "@/renderer/helpers/errorHelper";
 
-const header = "Pokemon List";
+const header = "Pokédex";
 const pokemonStore = usePokemonStore();
+const showError = computed(() => !!pokemonStore.error);
+const loading = computed(() => !!pokemonStore.loading);
 
 onMounted(async () => {
-  pokemonStore.resetStates();
-  try {
-    await pokemonStore.preload(36, 0);
-  } catch (e) {
-    showErrorPopup(e);
-    console.warn("[App] preload falló:", e?.message || e);
+  if (pokemonStore.total <= 0) {
+    try {
+      await pokemonStore.fetchPokemonList(151, 0);
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    await pokemonStore.loadPokemonListFromStorage();
   }
 });
 
 async function retryPreload() {
-  try {
-    pokemonStore.resetStates();
-    await pokemonStore.preload(36, 0);
-  } catch (e) {
-    showErrorPopup(e);
-  }
+  pokemonStore.clearError();
+  await pokemonStore.fetchPokemonList(36, 0);
 }
 </script>
 

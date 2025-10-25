@@ -1,12 +1,12 @@
 <template>
   <div>
     <div v-if="pokemonStore.loading && !pokemon">Loading...</div>
-    <PokemonDetails v-else-if="pokemon" :pokemon="pokemon"/>
+    <PokemonDetails v-else-if="pokemon" :pokemon="pokemon" />
   </div>
 </template>
 
 <script setup>
-import { computed, watch } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { usePokemonStore } from "@/renderer/stores/pokemonStore";
 import { showErrorPopup } from "@/renderer/helpers/errorHelper";
@@ -17,22 +17,24 @@ const router = useRouter();
 const pokemonStore = usePokemonStore();
 
 const id = computed(() => Number(route.params.id));
-const pokemon = computed(() => pokemonStore.cache[id.value]?.data ?? null);
-
-pokemonStore.loadPokemonById(id.value);
-
-watch(
-  () => pokemonStore.error,
-  (e) => {
-    if (e) {
-      showErrorPopup(e);
-      pokemonStore.clearError();
-      pokemonStore.resetStates();
-      router.replace("/list");
-    }
-  },
-  { immediate: true }
+const pokemon = computed(
+  () => pokemonStore.pokemonDetails[id.value]?.data ?? null
 );
+
+onMounted(async () => {
+  try {
+    let p = await pokemonStore.loadPokemonByIdFromStorage(id.value);
+    if (!p) {
+      p = await pokemonStore.fetchPokemonById(id.value);
+      if (!p) {
+        router.replace("/list");
+      }
+    }
+  } catch (e) {
+    showErrorPopup(e);
+    router.replace("/list");
+  }
+});
 </script>
 
 <style></style>

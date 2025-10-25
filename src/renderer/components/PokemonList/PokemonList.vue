@@ -7,9 +7,8 @@
       <div
         class="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"
       >
-        <div v-if="pokemonStore.loading">Loading...</div>
         <PokemonCard
-          v-for="pokemon in pokemonStore.list"
+          v-for="pokemon in pokemonStore.pokemonList"
           :key="pokemon.id"
           :id="pokemon.id"
           :pokemon="pokemon"
