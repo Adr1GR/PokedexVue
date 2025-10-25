@@ -125,21 +125,12 @@ export const usePokemonStore = defineStore("pokemon", {
             return { id, name: r.name, artwork, dominantColor: DEFAULT_COLOR };
           });
 
-          if (typeof window !== "undefined") {
-            for (const p of this.list) {
-              if (p.artwork) {
-                try {
-                  p.dominantColor = await getDominantColor(
-                    p.artwork,
-                    "LightVibrant"
-                  );
-                } catch (err) {
-                  console.error("getDominantColor failed for", p.artwork, err);
-                  p.dominantColor = DEFAULT_COLOR;
-                }
-              }
-            }
+          for (const p of this.list) {
+            p.dominantColor = p.artwork
+              ? await getDominantColor(p.artwork, "light")
+              : DEFAULT_COLOR;
           }
+
         } catch (e) {
           this.setError(e);
         } finally {
