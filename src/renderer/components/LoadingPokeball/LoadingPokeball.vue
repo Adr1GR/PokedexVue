@@ -1,6 +1,6 @@
 <template>
   <div class="loading-overlay">
-    <img src="@/assets/pokeball.png" alt="Loading" class="pokeball-spin" />
+    <img src="@/assets/images/pokeball.png" alt="Loading" class="pokeball-spin" />
   </div>
 </template>
 

@@ -18,7 +18,7 @@
         <span v-if="!loading">Load more</span>
         <img
           v-else
-          src="@/assets/pokeball.png"
+          src="@/assets/images/pokeball.png"
           alt="Loading"
           class="pokeball-spin-button"
         />

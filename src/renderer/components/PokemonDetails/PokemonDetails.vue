@@ -8,17 +8,26 @@
   >
     <!-- image -->
     <div
-      class="h-44 sm:h-70 md:h-90 overflow-hidden flex items-center justify-center border border-gray-300 rounded-md"
+      class="h-44 sm:h-70 md:h-90 overflow-hidden flex items-center justify-center border border-gray-300 rounded-md relative group"
       :style="{
         background: `linear-gradient(135deg, rgb(245,245,245) 50%, ${pokemon.dominantColor} 50%)`,
         boxShadow: `0 0 12px 1.5px ${pokemon.dominantColor}`,
         borderColor: pokemon.dominantColor,
       }"
     >
+      <!-- normal -->
       <img
-        :src="pokemon.artwork"
+        :src="pokemon.artwork.officialArtwork"
         :alt="pokemon.name"
-        class="w-full h-full object-contain"
+        class="w-full h-full object-contain transition-opacity duration-0 group-hover:opacity-0"
+        crossorigin="anonymous"
+      />
+
+      <!-- shiny -->
+      <img
+        :src="pokemon.artwork.officialArtworkShiny"
+        :alt="`${pokemon.name} shiny`"
+        class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-0 group-hover:opacity-100"
         crossorigin="anonymous"
       />
     </div>
@@ -42,7 +51,7 @@
       <ul>
         <li v-for="s in pokemon.stats" :key="s.name" class="mb-2">
           <div>
-            <span class=" capitalize">{{ s.name }}: </span>
+            <span class="capitalize">{{ s.name }}: </span>
             <span class="small-title capitalize">{{ s.base }}</span>
           </div>
 

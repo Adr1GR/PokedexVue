@@ -20,8 +20,10 @@ const idFromUrl = (url) => {
   return m ? Number(m[1]) : null;
 };
 
-const getArtworkUrl = (id) =>
-  `${SPRITES_BASE}pokemon/other/official-artwork/${id}.png`;
+const getArtworkUrl = (id) => ({
+  officialArtwork: `${SPRITES_BASE}pokemon/other/official-artwork/${id}.png`,
+  officialArtworkShiny: `${SPRITES_BASE}pokemon/other/official-artwork/shiny/${id}.png`,
+});
 
 export const usePokemonStore = defineStore("pokemon", {
   state: () => ({
@@ -72,7 +74,7 @@ export const usePokemonStore = defineStore("pokemon", {
 
       for (const p of this.pokemonList) {
         if (!p.dominantColor && p.artwork) {
-          p.dominantColor = await getDominantColor(p.artwork, "light");
+          p.dominantColor = await getDominantColor(p.artwork.officialArtwork, "light");
         }
       }
       return true;
@@ -108,7 +110,7 @@ export const usePokemonStore = defineStore("pokemon", {
             let dominantColor = DEFAULT_COLOR;
             if (artwork) {
               try {
-                dominantColor = await getDominantColor(artwork, "light");
+                dominantColor = await getDominantColor(artwork.officialArtwork, "light");
               } catch {
                 dominantColor = DEFAULT_COLOR;
               }
@@ -136,7 +138,7 @@ export const usePokemonStore = defineStore("pokemon", {
 
       if (!entry.data.dominantColor && entry.data.artwork) {
         entry.data.dominantColor = await getDominantColor(
-          entry.data.artwork,
+          entry.data.artwork.officialArtwork,
           "light"
         );
       }
@@ -191,7 +193,7 @@ export const usePokemonStore = defineStore("pokemon", {
             : [],
           artwork: getArtworkUrl(data.id),
           dominantColor: getArtworkUrl(data.id)
-            ? await getDominantColor(getArtworkUrl(data.id), "light")
+            ? await getDominantColor(getArtworkUrl(data.id).officialArtwork, "light")
             : DEFAULT_COLOR,
         };
 

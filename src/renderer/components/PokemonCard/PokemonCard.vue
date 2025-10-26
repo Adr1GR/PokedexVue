@@ -19,7 +19,7 @@
       >
         <img
           v-if="visible && pokemon"
-          :src="pokemon.artwork"
+          :src="pokemon.artwork.officialArtwork"
           :alt="pokemon.name"
           class="w-full h-full object-contain"
           loading="lazy"
@@ -59,22 +59,35 @@ const { pokemon } = defineProps({ pokemon: { type: Object, required: true } });
 const container = ref(null);
 const visible = ref(false);
 let observer;
+let timer = null;
 
 onMounted(() => {
   observer = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) {
-        visible.value = true;
-        observer.disconnect();
+        if (!timer) {
+          timer = setTimeout(() => {
+            visible.value = true;
+            timer = null;
+            observer.disconnect();
+          }, 200); // 0.20s
+        }
+      } else {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
       }
     },
     { threshold: 0.1 }
   );
+
   if (container.value) observer.observe(container.value);
 });
 
 onBeforeUnmount(() => {
   observer?.disconnect();
+  if (timer) clearTimeout(timer);
 });
 </script>
 
