@@ -36,7 +36,7 @@ export const usePokemonStore = defineStore("pokemon", {
     total: (s) => s.pokemonList.length,
   },
   persist: {
-    key: "pokemon-store-v2",
+    key: "pokemon-store-v2.1",
     paths: ["pokemonList", "pokemonDetails"],
   },
   actions: {
