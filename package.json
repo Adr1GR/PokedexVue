@@ -2,7 +2,7 @@
   "name": "pokedexvue",
   "productName": "Pokedex Vue",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A practice Vue project",
   "author": "Adrián <adriangelmotto@gmail.com>",
   "type": "module",
