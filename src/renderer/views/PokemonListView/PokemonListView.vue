@@ -16,12 +16,7 @@
         :disabled="loading"
       >
         <span v-if="!loading">Load more</span>
-        <img
-          v-else
-          src="@/assets/images/pokeball.png"
-          alt="Loading"
-          class="pokeball-spin-button"
-        />
+        <img v-else src="@/assets/images/pokeball.png" alt="Loading" class="pokeball-spin-button" />
       </button>
     </div>
 
@@ -33,30 +28,27 @@
     >
       <div>
         <div class="font-semibold">Unnable to connect</div>
-        <div class="text-sm mt-1">
-          Error: {{ pokemonStore.error?.message || "Unknown" }}
-        </div>
+        <div class="text-sm mt-1">Error: {{ pokemonStore.error?.message || 'Unknown' }}</div>
       </div>
       <div class="flex items-center gap-2">
-        <button
-          @click="retryPreload"
-          class="px-3 py-1 rounded bg-white text-black"
-        >
-          Retry
-        </button>
+        <button @click="retryPreload" class="px-3 py-1 rounded bg-white text-black">Retry</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed, watch } from "vue";
-import { usePokemonStore } from "@/renderer/stores/pokemonStore";
-import PokemonList from "@/renderer/components/PokemonList/PokemonList.vue";
-import LoadingPokeball from "@/renderer/components/LoadingPokeball/LoadingPokeball.vue";
+import { onMounted, computed } from 'vue';
+import { usePokemonStore } from '@/renderer/stores/pokemonStore';
+import PokemonList from '@/renderer/components/PokemonList/PokemonList.vue';
+import LoadingPokeball from '@/renderer/components/LoadingPokeball/LoadingPokeball.vue';
+import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
+import { FIRST_POKEMON_LOAD_QUANTITY } from '@/constants/appConstants';
 
-const header = "Pokédex";
+const appSettings = useAppSettingsStore();
 const pokemonStore = usePokemonStore();
+
+const header = 'Pokédex';
 const showError = computed(() => !!pokemonStore.error);
 const loading = computed(() => !!pokemonStore.loading);
 const listLength = computed(() => pokemonStore.total);
@@ -64,22 +56,20 @@ const listLength = computed(() => pokemonStore.total);
 onMounted(async () => {
   if (pokemonStore.total <= 0) {
     try {
-      await pokemonStore.fetchPokemonList(72, 0);
+      await pokemonStore.fetchAndSavePokemonEssentials(FIRST_POKEMON_LOAD_QUANTITY, 0);
     } catch (e) {
       console.log(e);
     }
-  } else {
-    await pokemonStore.loadPokemonListFromStorage();
   }
 });
 
 async function retryPreload() {
   pokemonStore.clearError();
-  await pokemonStore.fetchPokemonList(48, 0);
+  await pokemonStore.fetchAndSavePokemonEssentials(FIRST_POKEMON_LOAD_QUANTITY, 0);
 }
 
 async function loadMore() {
-  await pokemonStore.fetchPokemonList(30, listLength.value);
+  await pokemonStore.fetchAndSavePokemonEssentials(appSettings.pokemonList.loadMoreQuantity, listLength.value);
 }
 </script>
 
