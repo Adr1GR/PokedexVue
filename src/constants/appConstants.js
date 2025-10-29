@@ -1,6 +1,6 @@
 /* URLs */
 export const URL_POKEAPI_BASE = 'https://pokeapi.co/api/v2/';
-export const URL_SPRITES_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/';
+export const URL_SPRITES_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/';
 export const URL_CHECK_INTERNET_CONNECTION = 'https://www.google.com/favicon.ico';
 export const URL_APP_REPOSITORY = 'https://github.com/Adr1GR/PokedexVue';
 export const URL_APP_DOWNLOADS = 'https://github.com/Adr1GR/PokedexVue/releases/latest';
