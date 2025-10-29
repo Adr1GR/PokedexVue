@@ -6,12 +6,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { usePokemonStore } from "@/renderer/stores/pokemonStore";
-import { showErrorPopup } from "@/renderer/helpers/errorHelper";
-import PokemonDetails from "@/renderer/components/PokemonDetails/PokemonDetails.vue";
-import LoadingPokeball from "@/renderer/components/LoadingPokeball/LoadingPokeball.vue";
+import { computed, onMounted, onUpdated, ref, watch, watchEffect } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { usePokemonStore } from '@/renderer/stores/pokemonStore';
+import { showErrorPopup } from '@/renderer/helpers/errorsHelper';
+import PokemonDetails from '@/renderer/components/PokemonDetails/PokemonDetails.vue';
+import LoadingPokeball from '@/renderer/components/LoadingPokeball/LoadingPokeball.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -22,16 +22,15 @@ const localPokemon = ref(null);
 
 const loadPokemon = async (pokemonId) => {
   try {
-    localPokemon.value =
-      (await pokemonStore.loadPokemonByIdFromStorage(pokemonId)) ||
-      (await pokemonStore.fetchPokemonById(pokemonId));
+    const pokemonExists = await pokemonStore.pokemonByIdHasDetails(pokemonId);
 
-    if (!localPokemon.value) {
-      router.replace("/list");
+    if (pokemonExists == false) {
+      await pokemonStore.fetchAndSavePokemonDetails(pokemonId);
     }
+    localPokemon.value = pokemonStore.pokemons[pokemonId];
   } catch (e) {
     showErrorPopup(e);
-    router.replace("/list");
+    router.replace('/list');
   }
 };
 

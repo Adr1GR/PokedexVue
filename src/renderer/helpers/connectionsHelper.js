@@ -1,7 +1,9 @@
-import { showErrorPopup } from "@/renderer/helpers/errorHelper";
+import { URL_POKEAPI_BASE, URL_CHECK_INTERNET_CONNECTION } from "@/constants/appConstants";
+
+import { showErrorPopup } from "@/renderer/helpers/errorsHelper";
 
 const API_BASE =
-  import.meta.env.VITE_POKEAPI_BASE_URL ?? "https://pokeapi.co/api/v2/";
+  import.meta.env.VITE_POKEAPI_BASE_URL ?? URL_POKEAPI_BASE;
 const API_PING_PATH = API_BASE + "pokemon?limit=1";
 
 /**
@@ -17,7 +19,7 @@ export async function hasInternetConnection(timeout = 2500) {
   try {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
-    const res = await fetch("https://www.google.com/favicon.ico", {
+    const res = await fetch(URL_CHECK_INTERNET_CONNECTION, {
       method: "HEAD",
       mode: "no-cors",
       signal: controller.signal,

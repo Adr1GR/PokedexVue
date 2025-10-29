@@ -1,49 +1,37 @@
 <template>
   <div class="hover:-translate-y-1 duration-300" ref="container">
     <div
-      :style="{
-        background: `linear-gradient(135deg, rgb(245,245,245) 50%, ${pokemon.dominantColor} 50%)`,
-        boxShadow: `0 0 12px 1.5px ${pokemon.dominantColor}`,
-        borderColor: pokemon.dominantColor,
-      }"
+      :style="styles.container"
       class="relative flex flex-col overflow-hidden hover:shadow-xl max-w-sm border rounded-md transition-all duration-200"
     >
       <RouterLink
         class="z-20 absolute h-full w-full top-0 left-0"
-        :to="{ name: 'pokemon-details', params: { id: pokemon.id } }"
+        :to="{ name: 'pokemon-details', params: { id: pokemon.pokemonId } }"
       />
 
-      <!-- Imagen con overlay de nombre -->
-      <div
-        class="relative h-44 overflow-hidden flex items-center justify-center"
-      >
+      <!-- Image with name overlay -->
+      <div class="relative h-44 overflow-hidden flex items-center justify-center">
         <img
           v-if="visible && pokemon"
-          :src="pokemon.artwork.officialArtwork"
-          :alt="pokemon.name"
+          :src="pokemon.sprites[settingCardImageStyle]"
+          :alt="pokemon.names[settingAppLanguage]"
           class="w-full h-full object-contain"
           loading="lazy"
           crossorigin="anonymous"
+          :style="styles.image"
         />
 
-        <!-- ID arriba a la izquierda -->
-        <div
-          class="pokemon-card-id absolute top-0 left-0 text-left pl-2 pt-1"
-          :style="{ color: pokemon.dominantColor || '#1f1f20' }"
-        >
-          #{{ pokemon.id }}
+        <!-- ID top-left -->
+        <div class="pokemon-card-id absolute top-0 left-0 text-left pl-2 pt-1" :style="{ color: styles.idColor }">
+          #{{ pokemon.pokemonId }}
         </div>
 
-        <!-- Nombre abajo a la derecha -->
+        <!-- Name bottom-right -->
         <div
           class="absolute bottom-0 right-0 text-right pr-2 py-1"
-          :class="
-            shouldUseLightText(pokemon.dominantColor)
-              ? 'text-white'
-              : 'text-black'
-          "
+          :class="styles.nameTextColor === 'white' ? 'text-white' : 'text-black'"
         >
-          <h3 class="pokemon-card-name capitalize">{{ pokemon.name }}</h3>
+          <h3 class="pokemon-card-name capitalize">{{ pokemon.names[settingAppLanguage] }}</h3>
         </div>
       </div>
     </div>
@@ -51,15 +39,34 @@
 </template>
 
 <script setup>
-import { RouterLink } from "vue-router";
-import { shouldUseLightText } from "@/renderer/helpers/colorHelper";
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { RouterLink } from 'vue-router';
+import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
+import { TIMER_POKEMON_IMAGE_LOAD_WAITING_TIME } from '@/constants/appConstants';
+import { getPokemonCardStyles } from '@/renderer/helpers/stylesHelper';
+
+const appSettingsStore = useAppSettingsStore();
 
 const { pokemon } = defineProps({ pokemon: { type: Object, required: true } });
 const container = ref(null);
 const visible = ref(false);
+
 let observer;
 let timer = null;
+
+const settingAppLanguage = appSettingsStore.user.language;
+const settingCardImageStyle = appSettingsStore.pokemonList.cardImageStyle;
+const settingCardBackgroundStyle = appSettingsStore.pokemonList.cardBackgroundStyle;
+const settingCardBackgroundColor = appSettingsStore.pokemonList.cardBackgroundColor;
+
+const styles = computed(() =>
+  getPokemonCardStyles({
+    pokemon,
+    imageStyle: settingCardImageStyle,
+    backgroundStyle: settingCardBackgroundStyle,
+    backgroundColor: settingCardBackgroundColor,
+  })
+);
 
 onMounted(() => {
   observer = new IntersectionObserver(
@@ -70,7 +77,7 @@ onMounted(() => {
             visible.value = true;
             timer = null;
             observer.disconnect();
-          }, 200); // 0.20s
+          }, TIMER_POKEMON_IMAGE_LOAD_WAITING_TIME);
         }
       } else {
         if (timer) {
