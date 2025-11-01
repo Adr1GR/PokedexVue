@@ -66,147 +66,117 @@ export function getPokemonTypeColor(name) {
 /**
  * AI Generated
  *
- * Calculates three color tones from an image.
- * Only accepts imageSrc and sampleSize.
- * Always computes the medianLight color, then derives darker variants.
- * Returns an object: { medianLight, medianAverage, medianDark } in 'rgb(r,g,b)' format.
+ * Extracts only the medianLight color from an image.
+ * Uses aggressive downsampling and stride sampling for speed.
  *
  * @param {string} imageSrc - Image URL
- * @param {number} sampleSize - Size to which the image will be downscaled for faster processing
- * @returns {Promise<{medianLight:string, medianAverage:string, medianDark:string}>}
+ * @param {number} sampleSize - Downscale target size
+ * @param {number} stride - Pixel sampling stride
+ * @returns {Promise<string>} - medianLight color in 'rgb(r,g,b)' format
  */
-export async function getDominantColors(imageSrc, sampleSize = 10) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = imageSrc;
-
-    const getLum = (r, g, b) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-
-    const lighten = (color, blend) => ({
-      r: Math.round(color.r + (255 - color.r) * blend),
-      g: Math.round(color.g + (255 - color.g) * blend),
-      b: Math.round(color.b + (255 - color.b) * blend),
-    });
-
-    const darken = (color, amount) => ({
-      r: Math.max(0, Math.round(color.r * (1 - amount))),
-      g: Math.max(0, Math.round(color.g * (1 - amount))),
-      b: Math.max(0, Math.round(color.b * (1 - amount))),
-    });
-
-    const toRgbString = (c) => `rgb(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)})`;
-
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        const width = sampleSize;
-        const height = sampleSize;
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const data = ctx.getImageData(0, 0, width, height).data;
-        const pixels = [];
-
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i],
-            g = data[i + 1],
-            b = data[i + 2];
-          pixels.push([r, g, b]);
-        }
-
-        if (!pixels.length) {
-          return resolve({
-            plainDefaultColor: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-            medianLight: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-            medianAverage: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-            medianDark: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-          });
-        }
-
-        // --- Compute medianLight (the only heavy computation) ---
-        let medianLightColor;
-        const lightPixels = pixels.filter(([r, g, b]) => {
-          const lum = getLum(r, g, b);
-          return lum > 0.35 && lum < 0.95;
-        });
-
-        if (lightPixels.length) {
-          const sum = lightPixels.reduce(
-            (acc, [r, g, b]) => {
-              acc.r += r;
-              acc.g += g;
-              acc.b += b;
-              return acc;
-            },
-            { r: 0, g: 0, b: 0 }
-          );
-          medianLightColor = {
-            r: sum.r / lightPixels.length,
-            g: sum.g / lightPixels.length,
-            b: sum.b / lightPixels.length,
-          };
-        } else {
-          // Fallback: use average of all pixels
-          const sumAll = pixels.reduce(
-            (acc, [r, g, b]) => {
-              acc.r += r;
-              acc.g += g;
-              acc.b += b;
-              return acc;
-            },
-            { r: 0, g: 0, b: 0 }
-          );
-          medianLightColor = {
-            r: sumAll.r / pixels.length,
-            g: sumAll.g / pixels.length,
-            b: sumAll.b / pixels.length,
-          };
-        }
-
-        // Ensure the medianLight color is bright enough
-        const lum = getLum(medianLightColor.r, medianLightColor.g, medianLightColor.b);
-        const minAcceptLum = 0.4;
-        if (lum < minAcceptLum) {
-          const blend = Math.min(0.6, ((minAcceptLum - lum) / minAcceptLum) * 0.6);
-          medianLightColor = lighten(medianLightColor, blend);
-        }
-
-        // --- Derive medianAverage and medianDark from medianLight ---
-        // Adjustments: medianAverage slightly darker, medianDark much darker
-        const MEDIAN_AVERAGE_DARKEN = 0.18; // 18% darker
-        const MEDIAN_DARK_DARKEN = 0.36; // 36% darker
-
-        const medianAverageColor = darken(medianLightColor, MEDIAN_AVERAGE_DARKEN);
-        const medianDarkColor = darken(medianLightColor, MEDIAN_DARK_DARKEN);
-
-        resolve({
-          plainDefaultColor: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-          medianLight: toRgbString(medianLightColor),
-          medianAverage: toRgbString(medianAverageColor),
-          medianDark: toRgbString(medianDarkColor),
-        });
-      } catch (e) {
-        console.error('getDominantColors error:', e);
-        resolve({
-          plainDefaultColor: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-          medianLight: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-          medianAverage: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-          medianDark: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-        });
-      }
-    };
-    img.onerror = () =>
-      resolve({
-        plainDefaultColor: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-        medianLight: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-        medianAverage: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-        medianDark: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-      });
+export async function getMedianLight(imageSrc, sampleSize = 6, stride = 2) {
+  const getLum = (r, g, b) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  const lighten = (c, blend) => ({
+    r: c.r + (255 - c.r) * blend,
+    g: c.g + (255 - c.g) * blend,
+    b: c.b + (255 - c.b) * blend,
   });
+  const toRgb = (c) => `rgb(${c.r | 0},${c.g | 0},${c.b | 0})`;
+
+  const fallback = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
+
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.crossOrigin = 'anonymous';
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = imageSrc;
+    });
+
+    const size = Math.max(2, Math.floor(sampleSize));
+    const cvs = document.createElement('canvas');
+    cvs.width = size;
+    cvs.height = size;
+    const ctx = cvs.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, size, size);
+
+    const { data } = ctx.getImageData(0, 0, size, size);
+    const s = Math.max(1, stride);
+
+    let sumR = 0,
+      sumG = 0,
+      sumB = 0,
+      count = 0;
+
+    const LIGHT_MIN = 0.28,
+      LIGHT_MAX = 0.95;
+
+    for (let y = 0; y < size; y += s) {
+      for (let x = 0; x < size; x += s) {
+        const idx = (y * size + x) * 4;
+        const r = data[idx],
+          g = data[idx + 1],
+          b = data[idx + 2],
+          a = data[idx + 3];
+        if (a === 0) continue;
+        const lum = getLum(r, g, b);
+        if (lum > LIGHT_MIN && lum < LIGHT_MAX) {
+          sumR += r;
+          sumG += g;
+          sumB += b;
+          count++;
+        }
+      }
+    }
+
+    if (count === 0) return fallback;
+
+    let base = { r: sumR / count, g: sumG / count, b: sumB / count };
+    const lumBase = getLum(base.r, base.g, base.b);
+    const MIN_LUM = 0.4;
+    if (lumBase < MIN_LUM) {
+      const blend = Math.min(0.6, ((MIN_LUM - lumBase) / MIN_LUM) * 0.6);
+      base = lighten(base, blend);
+    }
+
+    return toRgb(base);
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * AI Generated
+ *
+ * Derives medianAverage and medianDark from a given medianLight color.
+ *
+ * @param {string} medianLight - Color in 'rgb(r,g,b)' format
+ * @returns {{medianAverage:string, medianDark:string}}
+ */
+export function deriveDarkVariants(medianLight) {
+  const parseRgb = (rgb) => {
+    const m = rgb.match(/rgb\((\d+),(\d+),(\d+)\)/);
+    if (!m) return { r: 200, g: 200, b: 200 };
+    return { r: +m[1], g: +m[2], b: +m[3] };
+  };
+
+  const darken = (c, amount) => ({
+    r: c.r * (1 - amount),
+    g: c.g * (1 - amount),
+    b: c.b * (1 - amount),
+  });
+
+  const toRgb = (c) => `rgb(${c.r | 0},${c.g | 0},${c.b | 0})`;
+
+  const base = parseRgb(medianLight);
+  const medianAverage = darken(base, 0.18);
+  const medianDark = darken(base, 0.36);
+
+  return {
+    medianAverage: toRgb(medianAverage),
+    medianDark: toRgb(medianDark),
+  };
 }
 
 /**

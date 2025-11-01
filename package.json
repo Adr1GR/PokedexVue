@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
     "dev:electron": "electron .",
-    "dev:web" : "concurrently -k \"vite\"",
+    "dev:web": "concurrently -k \"vite\"",
     "build:web": "vite build",
     "build:electron": "vite build && electron-builder -l AppImage",
     "build": "npm run build:web && electron-builder -l AppImage",
@@ -43,6 +43,7 @@
     "@capacitor/app": "^7.1.0",
     "@capacitor/core": "^7.4.3",
     "@tailwindcss/vite": "^4.1.14",
+    "@vueuse/core": "^14.0.0",
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
     "pinia": "^3.0.3",

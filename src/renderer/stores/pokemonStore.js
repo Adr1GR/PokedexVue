@@ -6,7 +6,7 @@ import {
 } from '@/constants/appConstants.js';
 import { defineStore } from 'pinia';
 import { hasInternetConnection, canFetchPokemon } from '@/renderer/helpers/connectionsHelper';
-import { getDominantColors } from '@/renderer/helpers/stylesHelper';
+import { getMedianLight, deriveDarkVariants } from '@/renderer/helpers/stylesHelper';
 
 const API_BASE = import.meta.env.VITE_POKEAPI_BASE_URL ?? URL_POKEAPI_BASE;
 const SPRITES_BASE = import.meta.env.VITE_POKESPRITES_BASE_URL ?? URL_SPRITES_BASE;
@@ -44,24 +44,21 @@ export const usePokemonStore = defineStore('pokemon', {
   }),
   getters: {
     total: (state) => Object.keys(state.pokemons).length,
-    getPokemonById: (state) => {
-      return (pokemonId) => state.pokemons[pokemonId] || null;
-    },
+    getPokemonById: (state) => (pokemonId) => state.pokemons[pokemonId] || null,
     getAllPokemons: (state) => Object.values(state.pokemons),
-    hasImageUrls: (state) => {
-      return (pokemonId) => {
-        const p = state.pokemons[pokemonId];
-        return p?.imageUrl && Object.keys(p.imageUrl).length > 0;
-      };
+    hasImageUrls: (state) => (pokemonId) => {
+      const p = state.pokemons[pokemonId];
+      return p?.imageUrl && Object.keys(p.imageUrl).length > 0;
     },
-    hasBackgroundColors: (state) => {
-      return (pokemonId) => {
-        const p = state.pokemons[pokemonId];
-        return (
-          p?.backgroundColors && Object.keys(p.backgroundColors).length > 0 && p.backgroundColors.plainDefaultColor
-        );
-      };
+    hasBackgroundColors: (state) => (pokemonId) => {
+      const p = state.pokemons[pokemonId];
+      return p?.backgroundColors && Object.keys(p.backgroundColors).length >= 3 && p.backgroundColors.plainDefaultColor;
     },
+    getPokemonsList: (state) =>
+      Object.entries(state.pokemons).map(([pokemonId, data]) => ({
+        pokemonId,
+        ...data,
+      })),
   },
 
   persist: {
@@ -118,37 +115,129 @@ export const usePokemonStore = defineStore('pokemon', {
     async fetchAndSavePokemonEssentials(limit = 20, offset = 0) {
       if (!(await this._pokemonFetchIsPossible())) return false;
 
+      // concurrency helper: run promise factories with a concurrency limit
+      const runConcurrent = async (factories, concurrency = 6) => {
+        const results = [];
+        let idx = 0;
+        const workers = new Array(Math.min(concurrency, factories.length)).fill(null).map(async () => {
+          while (idx < factories.length) {
+            const i = idx++;
+            try {
+              results[i] = await factories[i]();
+            } catch (err) {
+              results[i] = { status: 'rejected', reason: err };
+            }
+          }
+        });
+        await Promise.all(workers);
+        return results;
+      };
+
       try {
         const res = await fetch(`${API_BASE}pokemon?limit=${limit}&offset=${offset}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (!data?.results || !Array.isArray(data.results)) throw new Error('Malformed response from API');
 
-        const newPokemonEssentials = [];
-
-        for (const r of data.results) {
-          if (this.pokemonByIdHasDetails()) {
+        // --- FIRST PASS: compute medianLight for each result and save minimal pokemon entry ---
+        const factories = data.results.map((r) => {
+          return async () => {
             const pokemonId = pokemonIdFromUrl(r.url);
-            const sprites = getSprites(pokemonId) || null;
+            if (!pokemonId) return { pokemonId, ok: false };
 
-            const backgroundColors = await getDominantColors(sprites['officialArtwork']);
+            const sprites = getSprites(pokemonId);
 
-            newPokemonEssentials.push({
+            // attempt to get medianLight, but always catch errors and fallback
+            let medianLight;
+            try {
+              medianLight = await getMedianLight(sprites.officialArtwork);
+            } catch (err) {
+              console.error(`[getMedianLight] error for ${pokemonId}`, err);
+              medianLight = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
+            }
+
+            const newPokemonEssentials = {
               pokemonId,
               names: { en: r.name },
               sprites,
-              backgroundColors,
-            });
-          }
-        }
+              // store only medianLight for now. others will be derived later.
+              backgroundColors: {
+                medianLight,
+              },
+            };
 
-        for (const item of newPokemonEssentials) {
-          try {
-            await this._savePokemonDataById(item.pokemonId, item);
-          } catch (saveErr) {
-            console.error('Error guardando pokemon', item.pokemonId, saveErr);
-          }
-        }
+            try {
+              // save minimal data immediately
+              this._savePokemonDataById(pokemonId, newPokemonEssentials);
+              return { pokemonId, ok: true };
+            } catch (saveErr) {
+              console.error('Error saving (first pass) pokemon', pokemonId, saveErr);
+              return { pokemonId, ok: false, reason: saveErr };
+            }
+          };
+        });
+
+        // Run with limited concurrency to avoid heavy parallel work.
+        await runConcurrent(factories, 6);
+
+        // --- SECOND PASS: derive medianAverage & medianDark for saved entries and update them progressively ---
+        const allSavedIds = Object.keys(this.pokemons)
+          .map((k) => Number(k))
+          .filter(Boolean);
+
+        // Build factories for derivation only for entries that have medianLight but miss others.
+        const deriveFactories = allSavedIds.map((pokemonId) => {
+          return async () => {
+            const existing = this.getPokemonById(pokemonId);
+            if (!existing) return { pokemonId, ok: false, reason: 'missing' };
+
+            const bg = existing.backgroundColors ?? {};
+            // If already has the derived colors skip
+            if (bg.medianAverage && bg.medianDark) return { pokemonId, ok: true, skipped: true };
+
+            const medianLight =
+              bg.medianLight ??
+              (await getMedianLight(existing.sprites?.officialArtwork ?? getSprites(pokemonId).officialArtwork)).catch(
+                () => COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK
+              );
+
+            let derived;
+            try {
+              derived = deriveDarkVariants(medianLight);
+            } catch (err) {
+              console.error('[deriveDarkVariants] error', pokemonId, err);
+              derived = {
+                medianAverage: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
+                medianDark: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
+              };
+            }
+
+            const updatedBg = {
+              ...bg,
+              medianLight,
+              medianAverage: derived.medianAverage,
+              medianDark: derived.medianDark,
+            };
+
+            // Merge with existing minimal entry and save
+            const updated = {
+              ...existing,
+              backgroundColors: updatedBg,
+              lastUpdateTime: Date.now(),
+            };
+
+            try {
+              this._savePokemonDataById(pokemonId, updated);
+              return { pokemonId, ok: true };
+            } catch (saveErr) {
+              console.error('Error saving (second pass) pokemon', pokemonId, saveErr);
+              return { pokemonId, ok: false, reason: saveErr };
+            }
+          };
+        });
+
+        // Run second pass with a slightly lower concurrency to avoid UI jank.
+        await runConcurrent(deriveFactories, 4);
 
         return true;
       } catch (e) {
@@ -168,10 +257,54 @@ export const usePokemonStore = defineStore('pokemon', {
 
         const existing = this.getPokemonById(pokemonId);
         const sprites = existing != null ? existing.sprites : getSprites(pokemonId);
-        const backgroundColors =
-          existing && this.hasBackgroundColors(pokemonId)
-            ? existing.backgroundColors
-            : await getDominantColors(sprites['officialArtwork']); // getDominantColor
+
+        // --- COLOR LOGIC FIXED ---
+        // Keep existing full backgroundColors if it already contains derived values.
+        let backgroundColors = {};
+        const existingBg = existing?.backgroundColors ?? null;
+
+        const hasFullBg =
+          existingBg &&
+          typeof existingBg.plainDefaultColor === 'string' &&
+          typeof existingBg.medianLight === 'string' &&
+          typeof existingBg.medianAverage === 'string' &&
+          typeof existingBg.medianDark === 'string';
+
+        if (hasFullBg) {
+          // reuse full set
+          backgroundColors = existingBg;
+        } else {
+          // obtain medianLight either from existing partial data or by computing it
+          const fallback = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
+          let medianLight =
+            (existingBg && typeof existingBg.medianLight === 'string' && existingBg.medianLight) || null;
+
+          if (!medianLight) {
+            try {
+              medianLight = await getMedianLight(sprites?.officialArtwork);
+            } catch (err) {
+              console.error('[getMedianLight] error for', pokemonId, err);
+              medianLight = fallback;
+            }
+          }
+
+          // derive the other two colors
+          let derived = { medianAverage: fallback, medianDark: fallback };
+          try {
+            derived = deriveDarkVariants(medianLight);
+          } catch (err) {
+            console.error('[deriveDarkVariants] error for', pokemonId, err);
+            derived = { medianAverage: fallback, medianDark: fallback };
+          }
+
+          backgroundColors = {
+            plainDefaultColor: fallback,
+            medianLight,
+            medianAverage: derived.medianAverage,
+            medianDark: derived.medianDark,
+          };
+        }
+        // --- END COLOR LOGIC ---
 
         const pokemonSpecies = await this.getPokemonSpeciesByUrl(data.species.url);
 
@@ -182,7 +315,7 @@ export const usePokemonStore = defineStore('pokemon', {
             en: data.name,
           },
           sprites,
-          backgroundColors,
+          backgroundColors: backgroundColors,
           types: Array.isArray(data.types) ? data.types.map((t) => t.type.name) : [],
           stats: Array.isArray(data.stats)
             ? data.stats.map((s) => ({
@@ -191,8 +324,6 @@ export const usePokemonStore = defineStore('pokemon', {
               }))
             : [],
           species: pokemonSpecies,
-
-          // --- NUEVO ---
           height: data.height,
           weight: data.weight,
           abilities: Array.isArray(data.abilities)
@@ -259,7 +390,7 @@ export const usePokemonStore = defineStore('pokemon', {
           data.flavor_text_entries.forEach((entry) => {
             const lang = entry.language?.name;
             if (lang) {
-              flavorTextsByLanguage[lang] = entry.flavor_text.replace(/\f/g, ' '); // quitar saltos extraños
+              flavorTextsByLanguage[lang] = entry.flavor_text.replace(/\f/g, ' ');
             }
           });
         }

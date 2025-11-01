@@ -12,7 +12,7 @@
       <button
         v-if="listLength > 0"
         @click="loadMore"
-        class="secondary-text-color secondary-background-color mx-auto block px-12 py-3 rounded-xl font-semibold cursor-pointer flex items-center justify-center"
+        class="secondary-text-color secondary-background-color mx-auto px-12 py-3 rounded-xl font-semibold cursor-pointer flex items-center justify-center"
         :disabled="loading"
       >
         <span v-if="!loading">Load more</span>
