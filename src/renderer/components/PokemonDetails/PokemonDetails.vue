@@ -1,22 +1,20 @@
 <template>
-  <h1 class="title capitalize">{{ pokemon.names[settingAppLanguage] }}</h1>
+  <h1 class="title capitalize">{{ pokemon.name }}</h1>
 
   <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-    <!-- image -->
     <div
       class="h-44 sm:h-70 md:h-90 overflow-hidden flex items-center justify-center border rounded-md relative"
       :style="styles.container"
     >
       <img
-        :src="pokemonImages[settingCardImageStyle]"
-        :alt="pokemon.names[settingAppLanguage]"
+        :src="pokemon.sprites[settingCardImageStyle]"
+        :alt="pokemon.name"
         class="w-full h-full object-contain"
         crossorigin="anonymous"
         :style="styles.image"
       />
     </div>
 
-    <!-- pokedex info -->
     <div>
       <h3 class="medium-title">Pokedex Info</h3>
       <span
@@ -29,7 +27,6 @@
       </span>
     </div>
 
-    <!-- base stats -->
     <div>
       <h3 class="medium-title">Base Stats</h3>
       <ul>
@@ -57,34 +54,25 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
-import { usePokemonStore } from '@/renderer/stores/pokemonStore';
 import { getPokemonCardStyles } from '@/renderer/helpers/stylesHelper';
 import { getPokemonStatColor, getPokemonTypeColor } from '@/renderer/helpers/stylesHelper';
 
 const appSettingsStore = useAppSettingsStore();
 
-const pokemonImages = computed(() => pokemon.sprites);
-const pokemonId = computed(() => pokemon.pokemonId);
-
-const settingAppLanguage = appSettingsStore.user.language;
-
 const settingCardImageStyle = appSettingsStore.pokemonDetails.cardImageStyle;
 const settingCardBackgroundStyle = appSettingsStore.pokemonDetails.cardBackgroundStyle;
-const settingCardBackgroundColor = appSettingsStore.pokemonDetails.cardBackgroundColor;
-const settingDetailsPageStyle = appSettingsStore.pokemonDetails.pageStyle;
+//const settingDetailsPageStyle = appSettingsStore.pokemonDetails.pageStyle;
 
-const { pokemon } = defineProps({
-  pokemon: { type: Object, required: true },
-});
+const props = defineProps({ pokemon: Object });
+const pokemon = props.pokemon;
 
 const styles = computed(() =>
   getPokemonCardStyles({
-    pokemon,
     imageStyle: settingCardImageStyle,
     backgroundStyle: settingCardBackgroundStyle,
-    backgroundColor: settingCardBackgroundColor,
+    backgroundKey: pokemon.types[0],
   })
 );
 </script>

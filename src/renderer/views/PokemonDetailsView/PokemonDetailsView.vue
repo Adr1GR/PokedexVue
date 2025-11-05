@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUpdated, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { usePokemonStore } from '@/renderer/stores/pokemonStore';
 import { showErrorPopup } from '@/renderer/helpers/errorsHelper';
@@ -22,12 +22,9 @@ const localPokemon = ref(null);
 
 const loadPokemon = async (pokemonId) => {
   try {
-    const pokemonExists = await pokemonStore.pokemonByIdHasDetails(pokemonId);
-
-    if (pokemonExists == false) {
-      await pokemonStore.fetchAndSavePokemonDetails(pokemonId);
-    }
-    localPokemon.value = pokemonStore.pokemons[pokemonId];
+    //TODO: checks if needs update
+    await pokemonStore.fetchAndSavePokemonDetails(pokemonId);
+    localPokemon.value = await pokemonStore.pokemons[pokemonId];
   } catch (e) {
     showErrorPopup(e);
     router.replace('/list');

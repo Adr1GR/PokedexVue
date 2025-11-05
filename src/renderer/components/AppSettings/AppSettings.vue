@@ -1,12 +1,12 @@
 <template>
   <div class="">
     <!-- User -->
-    <section class="mb-4 bg-gray-50 rounded-md p-6 shadow">
+    <section class="settings-section shadow">
       <h2 class="medium-title">User</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col">
           <span class="small-title">Language</span>
-          <select v-model="language" class="input px-3 py-2 rounded border border-gray-300">
+          <select v-model="language" class="input settings-select">
             <option v-for="opt in LANGUAGES" :key="opt" :value="opt">
               {{ opt }}
             </option>
@@ -15,7 +15,7 @@
 
         <label class="flex flex-col">
           <span class="small-title">Theme</span>
-          <select v-model="theme" class="input px-3 py-2 rounded border border-gray-300">
+          <select v-model="theme" class="input settings-select">
             <option v-for="opt in THEMES" :key="opt" :value="opt">
               {{ opt }}
             </option>
@@ -25,12 +25,12 @@
     </section>
 
     <!-- Data -->
-    <section class="mb-4 bg-gray-50 rounded-lg p-6 shadow">
+    <section class="settings-select shadow">
       <h2 class="medium-title">Data</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col">
           <span class="small-title">Refresh rate (days)</span>
-          <select v-model="refreshRate" class="input px-3 py-2 rounded border border-gray-300">
+          <select v-model="refreshRate" class="input settings-select">
             <option v-for="opt in DATA_REFRESH_RATES" :key="String(opt)" :value="opt">
               {{ String(opt) }}
             </option>
@@ -40,12 +40,12 @@
     </section>
 
     <!-- Pokemon list -->
-    <section class="mb-4 bg-gray-50 rounded-lg p-6 shadow">
+    <section class="settings-select shadow">
       <h2 class="medium-title">Pokemon list</h2>
       <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col md:col-span-1">
           <span class="small-title">"Load more" quantity</span>
-          <select v-model="listLoadMoreQuantity" class="input px-3 py-2 rounded border border-gray-300">
+          <select v-model="listLoadMoreQuantity" class="input settings-select">
             <option v-for="opt in LIST_LOAD_MORE_QUANTITY_OPTIONS" :key="String(opt)" :value="opt">
               {{ String(opt) }}
             </option>
@@ -59,22 +59,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
           <label class="flex flex-col">
             <span class="small-title">Pokemon image style</span>
-            <select v-model="listCardImageStyle" class="input px-3 py-2 rounded border border-gray-300">
+            <select v-model="listCardImageStyle" class="input settings-select">
               <option v-for="opt in LIST_CARD_IMAGE_STYLES" :key="opt" :value="opt">{{ opt }}</option>
             </select>
           </label>
 
           <label class="flex flex-col">
             <span class="small-title">Pokemon background style</span>
-            <select v-model="listCardBackgroundStyle" class="input px-3 py-2 rounded border border-gray-300">
+            <select v-model="listCardBackgroundStyle" class="input settings-select">
               <option v-for="opt in LIST_CARD_BACKGROUND_STYLES" :key="opt" :value="opt">{{ opt }}</option>
-            </select>
-          </label>
-
-          <label class="flex flex-col">
-            <span class="small-title">Pokemon background color</span>
-            <select v-model="listCardBackgroundColor" class="input px-3 py-2 rounded border border-gray-300">
-              <option v-for="opt in LIST_CARD_BACKGROUND_COLORS" :key="opt" :value="opt">{{ opt }}</option>
             </select>
           </label>
         </div>
@@ -82,13 +75,13 @@
     </section>
 
     <!-- Pokemon details -->
-    <section class="mb-4 bg-gray-50 rounded-lg p-6 shadow">
+    <section class="settings-select shadow">
       <h2 class="medium-title">Pokemon details</h2>
 
       <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col">
           <span class="small-title">Pokemon details page style</span>
-          <select v-model="detailsPageStyle" class="input px-3 py-2 rounded border border-gray-300">
+          <select v-model="detailsPageStyle" class="input settings-select">
             <option v-for="opt in DETAILS_PAGE_STYLES" :key="opt" :value="opt">{{ opt }}</option>
           </select>
         </label>
@@ -99,22 +92,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
           <label class="flex flex-col">
             <span class="small-title">Pokemon image style</span>
-            <select v-model="detailsCardImageStyle" class="input px-3 py-2 rounded border border-gray-300">
+            <select v-model="detailsCardImageStyle" class="input settings-select">
               <option v-for="opt in DETAILS_CARD_IMAGE_STYLES" :key="opt" :value="opt">{{ opt }}</option>
             </select>
           </label>
 
           <label class="flex flex-col">
             <span class="small-title">Pokemon background style</span>
-            <select v-model="detailsCardBackgroundStyle" class="input px-3 py-2 rounded border border-gray-300">
+            <select v-model="detailsCardBackgroundStyle" class="input settings-select">
               <option v-for="opt in DETAILS_CARD_BACKGROUND_STYLES" :key="opt" :value="opt">{{ opt }}</option>
-            </select>
-          </label>
-
-          <label class="flex flex-col">
-            <span class="small-title">Pokemon background color</span>
-            <select v-model="detailsCardBackgroundColor" class="input px-3 py-2 rounded border border-gray-300">
-              <option v-for="opt in DETAILS_CARD_BACKGROUND_COLORS" :key="opt" :value="opt">{{ opt }}</option>
             </select>
           </label>
         </div>
@@ -123,12 +109,6 @@
 
     <!-- Actions -->
     <div class="flex gap-3">
-      <!-- <button
-        class="px-4 py-2 secondary-background-color secondary-text-color rounded-md"
-        @click="resetToDefaults"
-      >
-        Reset to defaults
-      </button> -->
       <button
         class="px-4 py-2 border border-primary-text-color rounded-md cursor-pointer text-red-600"
         @click="initDefaultsForce"
@@ -140,8 +120,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
 import {
   // ---- user-visible settings
   SETTINGS_OPTIONS_APP_LANGUAGES,
@@ -151,14 +129,14 @@ import {
   // ---- list/card settings
   SETTINGS_OPTIONS_POKEMON_LIST_IMAGE_STYLES,
   SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_STYLES,
-  SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_COLORS,
   SETTINGS_OPTIONS_POKEMON_LIST_LOAD_MORE_QUANTITY,
   // ---- details page settings
   SETTINGS_OPTIONS_POKEMON_DETAILS_PAGE_STYLES,
   SETTINGS_OPTIONS_POKEMON_DETAILS_IMAGE_STYLES,
   SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_STYLES,
-  SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_COLORS,
 } from '@/constants/appConstants.js';
+import { computed } from 'vue';
+import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
 
 const store = useAppSettingsStore();
 
@@ -188,10 +166,6 @@ const listCardBackgroundStyle = computed({
   get: () => store.pokemonList.cardBackgroundStyle,
   set: (v) => store.setListCardBackgroundStyle(v),
 });
-const listCardBackgroundColor = computed({
-  get: () => store.pokemonList.cardBackgroundColor,
-  set: (v) => store.setListCardBackgroundColor(v),
-});
 const listLoadMoreQuantity = computed({
   get: () => store.pokemonList.loadMoreQuantity,
   set: (v) => store.setListLoadMoreQuantity(v),
@@ -201,10 +175,6 @@ const listLoadMoreQuantity = computed({
 const detailsCardImageStyle = computed({
   get: () => store.pokemonDetails.cardImageStyle,
   set: (v) => store.setDetailsCardImageStyle(v),
-});
-const detailsCardBackgroundColor = computed({
-  get: () => store.pokemonDetails.cardBackgroundColor,
-  set: (v) => store.setDetailsCardBackgroundColor(v),
 });
 const detailsCardBackgroundStyle = computed({
   get: () => store.pokemonDetails.cardBackgroundStyle,
@@ -224,19 +194,16 @@ const DATA_REFRESH_RATES = SETTINGS_OPTIONS_POKEMON_DATA_REFRESH_RATES;
 // ---- list/card settings
 const LIST_CARD_IMAGE_STYLES = SETTINGS_OPTIONS_POKEMON_LIST_IMAGE_STYLES;
 const LIST_CARD_BACKGROUND_STYLES = SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_STYLES;
-const LIST_CARD_BACKGROUND_COLORS = SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_COLORS;
 const LIST_LOAD_MORE_QUANTITY_OPTIONS = SETTINGS_OPTIONS_POKEMON_LIST_LOAD_MORE_QUANTITY;
 // ---- details page settings
 const DETAILS_CARD_IMAGE_STYLES = SETTINGS_OPTIONS_POKEMON_DETAILS_IMAGE_STYLES;
 const DETAILS_CARD_BACKGROUND_STYLES = SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_STYLES;
-const DETAILS_CARD_BACKGROUND_COLORS = SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_COLORS;
 const DETAILS_PAGE_STYLES = SETTINGS_OPTIONS_POKEMON_DETAILS_PAGE_STYLES;
 
 // Actions
-function resetToDefaults() {
-  store.resetToDefaults();
-}
 function initDefaultsForce() {
   store.initDefaults({ force: true });
 }
 </script>
+
+<style scoped lang="scss" src="./AppSettings.scss" />

@@ -74,13 +74,13 @@ async function setupDevReload() {
         try {
           await w.webContents.session.clearCache();
           w.webContents.reloadIgnoringCache();
-        } catch (err) {
-          console.error("Error reloading window:", err);
+        } catch (e) {
+          console.error("Error reloading window:", e);
         }
       }
     });
-  } catch (err) {
-    console.warn("chokidar watcher not available:", err?.message || err);
+  } catch (e) {
+    console.warn("chokidar watcher not available:", e?.message || e);
   }
 }
 
