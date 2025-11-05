@@ -1,70 +1,61 @@
 <template>
-  <div class="hover:-translate-y-1 duration-300" ref="container">
-    <div
-      :style="styles.container"
-      class="relative flex flex-col overflow-hidden hover:shadow-xl max-w-sm border rounded-md transition-all duration-200"
-    >
-      <RouterLink
-        class="z-20 absolute h-full w-full top-0 left-0"
-        :to="{ name: 'pokemon-details', params: { id: pokemon.pokemonId } }"
+  <div ref="container" :style="styles.container" class="pokemon-card-container">
+    <RouterLink class="pokemon-card-details-link" :to="{ name: 'pokemon-details', params: { id: pokemon.id } }" />
+    <div class="image-wrapper">
+      <img
+        v-if="visible && pokemon"
+        :src="pokemonImage"
+        :alt="pokemon.identifier"
+        :class="[
+          'pokemon-image transition-all duration-50 ease-in-out',
+          imageLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-md',
+        ]"
+        loading="lazy"
+        crossorigin="anonymous"
+        :style="styles.image"
+        style="will-change: opacity, filter"
+        @load="imageLoaded = true"
       />
-
-      <!-- Image with name overlay -->
-      <div class="relative h-44 overflow-hidden flex items-center justify-center">
-        <img
-          v-if="visible && pokemon"
-          :src="pokemon.sprites[settingCardImageStyle]"
-          :alt="pokemon.names[settingAppLanguage]"
-          class="w-full h-full object-contain"
-          loading="lazy"
-          crossorigin="anonymous"
-          :style="styles.image"
-        />
-
-        <!-- ID top-left -->
-        <div class="pokemon-card-id absolute top-0 left-0 text-left pl-2 pt-1" :style="{ color: styles.idColor }">
-          #{{ pokemon.pokemonId }}
-        </div>
-
-        <!-- Name bottom-right -->
-        <div
-          class="absolute bottom-0 right-0 text-right pr-2 py-1"
-          :class="styles.nameTextColor === 'white' ? 'text-white' : 'text-black'"
-        >
-          <h3 class="pokemon-card-name capitalize">{{ pokemon.names[settingAppLanguage] }}</h3>
-        </div>
+      <div class="pokemon-card-id" :style="{ color: styles.idColor }">#{{ pokemon.id }}</div>
+      <div>
+        <span class="pokemon-card-name">
+          {{ pokemon.identifier }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { TIMER_POKEMON_IMAGE_LOAD_WAITING_TIME } from '@/constants/appConstants';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useAppSettingsStore } from '@/renderer/stores/appSettingsStore';
-import { TIMER_POKEMON_IMAGE_LOAD_WAITING_TIME } from '@/constants/appConstants';
 import { getPokemonCardStyles } from '@/renderer/helpers/stylesHelper';
+import { usePokemonStore } from '@/renderer/stores/pokemonStore';
 
+const pokemonStore = usePokemonStore();
 const appSettingsStore = useAppSettingsStore();
 
-const { pokemon } = defineProps({ pokemon: { type: Object, required: true } });
+const settingCardImageStyle = appSettingsStore.pokemonList.cardImageStyle;
+const settingCardBackgroundStyle = appSettingsStore.pokemonList.cardBackgroundStyle;
+
+const props = defineProps({ pokemon: Object });
+const pokemon = ref(props.pokemon);
+const pokemonImage = ref(pokemonStore.getImageUrlFromPokemon(pokemon.value.id, settingCardImageStyle));
+
 const container = ref(null);
 const visible = ref(false);
+const imageLoaded = ref(false);
 
 let observer;
 let timer = null;
 
-const settingAppLanguage = appSettingsStore.user.language;
-const settingCardImageStyle = appSettingsStore.pokemonList.cardImageStyle;
-const settingCardBackgroundStyle = appSettingsStore.pokemonList.cardBackgroundStyle;
-const settingCardBackgroundColor = appSettingsStore.pokemonList.cardBackgroundColor;
-
 const styles = computed(() =>
   getPokemonCardStyles({
-    pokemon,
     imageStyle: settingCardImageStyle,
     backgroundStyle: settingCardBackgroundStyle,
-    backgroundColor: settingCardBackgroundColor,
+    backgroundKey: pokemon.value.type_id_1,
   })
 );
 

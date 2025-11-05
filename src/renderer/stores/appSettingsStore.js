@@ -11,12 +11,10 @@ import {
   // ---- list/card settings
   SETTINGS_OPTIONS_POKEMON_LIST_IMAGE_STYLES,
   SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_STYLES,
-  SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_COLORS,
   SETTINGS_OPTIONS_POKEMON_LIST_LOAD_MORE_QUANTITY,
   // ---- details page settings
   SETTINGS_OPTIONS_POKEMON_DETAILS_IMAGE_STYLES,
   SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_STYLES,
-  SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_COLORS,
   SETTINGS_OPTIONS_POKEMON_DETAILS_PAGE_STYLES,
 
   /** ===== SETTINGS DEFAULT OPTIONS ===== */
@@ -28,12 +26,10 @@ import {
   // ---- list/card settings
   DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES,
   DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_STYLES,
-  DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_COLORS,
   DEFAULT_OPTION_POKEMON_LIST_LOAD_MORE_QUANTITY,
   // ---- details page settings
   DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES,
   DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_STYLES,
-  DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_COLORS,
   DEFAULT_OPTION_POKEMON_DETAILS_PAGE_STYLES,
 
   /** Color defaults / fallbacks */
@@ -60,7 +56,6 @@ export const useAppSettingsStore = defineStore('appSettings', {
     pokemonList: {
       cardImageStyle: DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES,
       cardBackgroundStyle: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_STYLES,
-      cardBackgroundColor: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_COLORS,
       loadMoreQuantity: DEFAULT_OPTION_POKEMON_LIST_LOAD_MORE_QUANTITY,
     },
 
@@ -68,7 +63,6 @@ export const useAppSettingsStore = defineStore('appSettings', {
     pokemonDetails: {
       cardImageStyle: DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES,
       cardBackgroundStyle: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_STYLES,
-      cardBackgroundColor: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_COLORS,
       pageStyle: DEFAULT_OPTION_POKEMON_DETAILS_PAGE_STYLES,
     },
 
@@ -94,13 +88,11 @@ export const useAppSettingsStore = defineStore('appSettings', {
       // list
       cardImageStyle: s.pokemonList.imageStyle,
       cardBackgroundStyle: s.pokemonList.cardBackgroundStyle,
-      cardBackgroundColor: s.pokemonList.cardBackgroundColor,
       loadMoreQuantity: s.pokemonList.loadMoreQuantity,
 
       // details
       cardImageStyle: s.pokemonList.imageStyle,
       cardBackgroundStyle: s.pokemonList.cardBackgroundStyle,
-      cardBackgroundColor: s.pokemonList.cardBackgroundColor,
       pageStyle: s.pokemonList.pageStyle,
     }),
   },
@@ -138,12 +130,6 @@ export const useAppSettingsStore = defineStore('appSettings', {
       }
     },
 
-    setListCardBackgroundColor(backgroundColor) {
-      if (SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_COLORS.includes(backgroundColor)) {
-        this.pokemonList.cardBackgroundColor = backgroundColor;
-      }
-    },
-
     setListLoadMoreQuantity(quantity) {
       if (SETTINGS_OPTIONS_POKEMON_LIST_LOAD_MORE_QUANTITY.includes(quantity)) {
         this.pokemonList.loadMoreQuantity = quantity;
@@ -160,12 +146,6 @@ export const useAppSettingsStore = defineStore('appSettings', {
     setDetailsCardBackgroundStyle(backgroundStyle) {
       if (SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_STYLES.includes(backgroundStyle)) {
         this.pokemonDetails.cardBackgroundStyle = backgroundStyle;
-      }
-    },
-
-    setDetailsCardBackgroundColor(backgroundColor) {
-      if (SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_COLORS.includes(backgroundColor)) {
-        this.pokemonDetails.cardBackgroundColor = backgroundColor;
       }
     },
 
@@ -192,13 +172,11 @@ export const useAppSettingsStore = defineStore('appSettings', {
         pokemonList: {
           cardImageStyle: DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES ?? 'officialArtwork',
           cardBackgroundStyle: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_STYLES ?? 'diagonal',
-          cardBackgroundColor: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_COLORS ?? 'medianLight',
           loadMoreQuantity: DEFAULT_OPTION_POKEMON_LIST_LOAD_MORE_QUANTITY ?? 30,
         },
         pokemonDetails: {
           cardImageStyle: DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES ?? 'officialArtwork',
           cardBackgroundStyle: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_STYLES ?? 'diagonal',
-          cardBackgroundColor: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_COLORS ?? 'medianLight',
           pageStyle: DEFAULT_OPTION_POKEMON_DETAILS_PAGE_STYLES ?? 'default',
         },
       };
@@ -226,13 +204,11 @@ export const useAppSettingsStore = defineStore('appSettings', {
         pokemonList: {
           cardImageStyle: DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES ?? 'officialArtwork',
           cardBackgroundStyle: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_STYLES ?? 'diagonal',
-          cardBackgroundColor: DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_COLORS ?? 'medianLight',
           loadMoreQuantity: DEFAULT_OPTION_POKEMON_LIST_LOAD_MORE_QUANTITY ?? 30,
         },
         pokemonDetails: {
           cardImageStyle: DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES ?? 'officialArtwork',
           cardBackgroundStyle: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_STYLES ?? 'diagonal',
-          cardBackgroundColor: DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_COLORS ?? 'medianLight',
           pageStyle: DEFAULT_OPTION_POKEMON_DETAILS_PAGE_STYLES ?? 'default',
         },
       });

@@ -1,23 +1,12 @@
-import {
-  URL_POKEAPI_BASE,
-  URL_SPRITES_BASE,
-  STORE_KEY_POKEMON,
-  COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-} from '@/constants/appConstants.js';
+import { URL_POKEAPI_BASE, URL_SPRITES_BASE, URL_POKEMON_DATA, STORE_KEY_POKEMON } from '@/constants/appConstants.js';
 import { defineStore } from 'pinia';
 import { hasInternetConnection, canFetchPokemon } from '@/renderer/helpers/connectionsHelper';
-import { getMedianLight, deriveDarkVariants } from '@/renderer/helpers/stylesHelper';
 
 const API_BASE = import.meta.env.VITE_POKEAPI_BASE_URL ?? URL_POKEAPI_BASE;
+const POKEMON_DATA = import.meta.env.VITE_POKEMON_DATA_URL ?? URL_POKEMON_DATA;
 const SPRITES_BASE = import.meta.env.VITE_POKESPRITES_BASE_URL ?? URL_SPRITES_BASE;
 
-const pokemonIdFromUrl = (url) => {
-  if (!url || typeof url !== 'string') return null;
-  const m = url.match(/\/pokemon\/(\d+)\/?$/);
-  return m ? Number(m[1]) : null;
-};
-
-const getSprites = (pokemonId) => ({
+const getSprites = (id) => ({
   tileSprite: {
     tileName: null,
     position: {
@@ -25,15 +14,15 @@ const getSprites = (pokemonId) => ({
       y: null,
     },
   },
-  officialArtwork: `${SPRITES_BASE}pokemon/other/official-artwork/${pokemonId}.png`,
-  officialArtworkShiny: `${SPRITES_BASE}pokemon/other/official-artwork/shiny/${pokemonId}.png`,
-  sprite: `${SPRITES_BASE}pokemon/${pokemonId}.png`,
-  spriteBack: `${SPRITES_BASE}pokemon/back/${pokemonId}.png`,
-  spriteShiny: `${SPRITES_BASE}pokemon/shiny/${pokemonId}.png`,
-  spriteShinyBack: `${SPRITES_BASE}pokemon/back/shiny/${pokemonId}.png`,
-  home: `${SPRITES_BASE}pokemon/other/home/${pokemonId}.png`,
-  homeShiny: `${SPRITES_BASE}pokemon/other/home/shiny/${pokemonId}.png`,
-  showdown: `${SPRITES_BASE}pokemon/other/showdown/${pokemonId}.gif`,
+  officialArtwork: `${SPRITES_BASE}pokemon/other/official-artwork/${id}.png`,
+  officialArtworkShiny: `${SPRITES_BASE}pokemon/other/official-artwork/shiny/${id}.png`,
+  sprite: `${SPRITES_BASE}pokemon/${id}.png`,
+  spriteBack: `${SPRITES_BASE}pokemon/back/${id}.png`,
+  spriteShiny: `${SPRITES_BASE}pokemon/shiny/${id}.png`,
+  spriteShinyBack: `${SPRITES_BASE}pokemon/back/shiny/${id}.png`,
+  home: `${SPRITES_BASE}pokemon/other/home/${id}.png`,
+  homeShiny: `${SPRITES_BASE}pokemon/other/home/shiny/${id}.png`,
+  showdown: `${SPRITES_BASE}pokemon/other/showdown/${id}.gif`,
 });
 
 export const usePokemonStore = defineStore('pokemon', {
@@ -44,21 +33,18 @@ export const usePokemonStore = defineStore('pokemon', {
   }),
   getters: {
     total: (state) => Object.keys(state.pokemons).length,
-    getPokemonById: (state) => (pokemonId) => state.pokemons[pokemonId] || null,
+    getPokemonById: (state) => (id) => state.pokemons[id] || null,
     getAllPokemons: (state) => Object.values(state.pokemons),
-    hasImageUrls: (state) => (pokemonId) => {
-      const p = state.pokemons[pokemonId];
+    hasImageUrls: (state) => (id) => {
+      const p = state.pokemons[id];
       return p?.imageUrl && Object.keys(p.imageUrl).length > 0;
     },
-    hasBackgroundColors: (state) => (pokemonId) => {
-      const p = state.pokemons[pokemonId];
-      return p?.backgroundColors && Object.keys(p.backgroundColors).length >= 3 && p.backgroundColors.plainDefaultColor;
-    },
     getPokemonsList: (state) =>
-      Object.entries(state.pokemons).map(([pokemonId, data]) => ({
-        pokemonId,
+      Object.entries(state.pokemons).map(([id, data]) => ({
+        id,
         ...data,
       })),
+    getImageUrlFromPokemon: (state) => (id, imageStyle) => state.pokemons[id].sprites[imageStyle] || null,
   },
 
   persist: {
@@ -66,15 +52,15 @@ export const usePokemonStore = defineStore('pokemon', {
     paths: ['pokemons'],
   },
   actions: {
-    _savePokemonDataById(pokemonId, data) {
-      if (!pokemonId) return;
+    _savePokemonDataById(id, data) {
+      if (!id) return;
       if (!data || typeof data !== 'object') return;
-      this.pokemons[pokemonId] = { ...data, lastUpdateTime: Date.now() };
-      return this.pokemons[pokemonId];
+      this.pokemons[id] = { ...data, lastUpdateTime: Date.now() };
+      return this.pokemons[id];
     },
 
-    _isStalePokemon(pokemonId) {
-      const entry = this.pokemonDetails[pokemonId];
+    _isStalePokemon(id) {
+      const entry = this.pokemonDetails[id];
       if (!entry) return true;
       return Date.now() - entry.updatedAt > 1000 * 60 * 60 * 24 * 7; // TODO: READ SETTINGS data.refreshRate
     },
@@ -93,8 +79,8 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
 
-    async pokemonByIdHasDetails(pokemonId) {
-      const pokemon = await this.getPokemonById(pokemonId);
+    async pokemonByIdHasDetails(id) {
+      const pokemon = await this.getPokemonById(id);
       if (pokemon != null && pokemon?.baseExperience != null) {
         return true;
       }
@@ -112,135 +98,16 @@ export const usePokemonStore = defineStore('pokemon', {
       this.error = null;
     },
 
-    async fetchAndSavePokemonEssentials(limit = 20, offset = 0) {
-      if (!(await this._pokemonFetchIsPossible())) return false;
-
-      // concurrency helper: run promise factories with a concurrency limit
-      const runConcurrent = async (factories, concurrency = 6) => {
-        const results = [];
-        let idx = 0;
-        const workers = new Array(Math.min(concurrency, factories.length)).fill(null).map(async () => {
-          while (idx < factories.length) {
-            const i = idx++;
-            try {
-              results[i] = await factories[i]();
-            } catch (err) {
-              results[i] = { status: 'rejected', reason: err };
-            }
-          }
-        });
-        await Promise.all(workers);
-        return results;
-      };
-
+    async getAllPokemonsList() {
+      this.loading = true;
       try {
-        const res = await fetch(`${API_BASE}pokemon?limit=${limit}&offset=${offset}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!data?.results || !Array.isArray(data.results)) throw new Error('Malformed response from API');
-
-        // --- FIRST PASS: compute medianLight for each result and save minimal pokemon entry ---
-        const factories = data.results.map((r) => {
-          return async () => {
-            const pokemonId = pokemonIdFromUrl(r.url);
-            if (!pokemonId) return { pokemonId, ok: false };
-
-            const sprites = getSprites(pokemonId);
-
-            // attempt to get medianLight, but always catch errors and fallback
-            let medianLight;
-            try {
-              medianLight = await getMedianLight(sprites.officialArtwork);
-            } catch (err) {
-              console.error(`[getMedianLight] error for ${pokemonId}`, err);
-              medianLight = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
-            }
-
-            const newPokemonEssentials = {
-              pokemonId,
-              names: { en: r.name },
-              sprites,
-              // store only medianLight for now. others will be derived later.
-              backgroundColors: {
-                medianLight,
-              },
-            };
-
-            try {
-              // save minimal data immediately
-              this._savePokemonDataById(pokemonId, newPokemonEssentials);
-              return { pokemonId, ok: true };
-            } catch (saveErr) {
-              console.error('Error saving (first pass) pokemon', pokemonId, saveErr);
-              return { pokemonId, ok: false, reason: saveErr };
-            }
-          };
-        });
-
-        // Run with limited concurrency to avoid heavy parallel work.
-        await runConcurrent(factories, 6);
-
-        // --- SECOND PASS: derive medianAverage & medianDark for saved entries and update them progressively ---
-        const allSavedIds = Object.keys(this.pokemons)
-          .map((k) => Number(k))
-          .filter(Boolean);
-
-        // Build factories for derivation only for entries that have medianLight but miss others.
-        const deriveFactories = allSavedIds.map((pokemonId) => {
-          return async () => {
-            const existing = this.getPokemonById(pokemonId);
-            if (!existing) return { pokemonId, ok: false, reason: 'missing' };
-
-            const bg = existing.backgroundColors ?? {};
-            // If already has the derived colors skip
-            if (bg.medianAverage && bg.medianDark) return { pokemonId, ok: true, skipped: true };
-
-            const medianLight =
-              bg.medianLight ??
-              (await getMedianLight(existing.sprites?.officialArtwork ?? getSprites(pokemonId).officialArtwork)).catch(
-                () => COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK
-              );
-
-            let derived;
-            try {
-              derived = deriveDarkVariants(medianLight);
-            } catch (err) {
-              console.error('[deriveDarkVariants] error', pokemonId, err);
-              derived = {
-                medianAverage: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-                medianDark: COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK,
-              };
-            }
-
-            const updatedBg = {
-              ...bg,
-              medianLight,
-              medianAverage: derived.medianAverage,
-              medianDark: derived.medianDark,
-            };
-
-            // Merge with existing minimal entry and save
-            const updated = {
-              ...existing,
-              backgroundColors: updatedBg,
-              lastUpdateTime: Date.now(),
-            };
-
-            try {
-              this._savePokemonDataById(pokemonId, updated);
-              return { pokemonId, ok: true };
-            } catch (saveErr) {
-              console.error('Error saving (second pass) pokemon', pokemonId, saveErr);
-              return { pokemonId, ok: false, reason: saveErr };
-            }
-          };
-        });
-
-        // Run second pass with a slightly lower concurrency to avoid UI jank.
-        await runConcurrent(deriveFactories, 4);
-
-        return true;
+        const data = await fetch(POKEMON_DATA)
+          .then((response) => response.json())
+          .catch((e) => console.error('Error fetching JSON: ', e));
+        this.loading = false;
+        return data;
       } catch (e) {
+        console.error(e);
         this.setError(e);
         return false;
       } finally {
@@ -248,74 +115,37 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
 
-    async fetchAndSavePokemonDetails(pokemonId) {
+    async addImageUrlToPokemons(list) {
+      list.forEach(async (e) => {
+        const pokemonImages = {
+          sprites: getSprites(e.id),
+        };
+        try {
+          await this._savePokemonDataById(e.id, pokemonImages);
+        } catch (e) {
+          console.error('Error saving pokemon', e);
+        }
+      });
+    },
+
+    async fetchAndSavePokemonDetails(id) {
       if (!(await this._pokemonFetchIsPossible())) return false;
       try {
-        const res = await fetch(`${API_BASE}pokemon/${pokemonId}`);
+        const res = await fetch(`${API_BASE}pokemon/${id}`);
         //if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-
-        const existing = this.getPokemonById(pokemonId);
-        const sprites = existing != null ? existing.sprites : getSprites(pokemonId);
-
-        // --- COLOR LOGIC FIXED ---
-        // Keep existing full backgroundColors if it already contains derived values.
-        let backgroundColors = {};
-        const existingBg = existing?.backgroundColors ?? null;
-
-        const hasFullBg =
-          existingBg &&
-          typeof existingBg.plainDefaultColor === 'string' &&
-          typeof existingBg.medianLight === 'string' &&
-          typeof existingBg.medianAverage === 'string' &&
-          typeof existingBg.medianDark === 'string';
-
-        if (hasFullBg) {
-          // reuse full set
-          backgroundColors = existingBg;
-        } else {
-          // obtain medianLight either from existing partial data or by computing it
-          const fallback = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
-          let medianLight =
-            (existingBg && typeof existingBg.medianLight === 'string' && existingBg.medianLight) || null;
-
-          if (!medianLight) {
-            try {
-              medianLight = await getMedianLight(sprites?.officialArtwork);
-            } catch (err) {
-              console.error('[getMedianLight] error for', pokemonId, err);
-              medianLight = fallback;
-            }
-          }
-
-          // derive the other two colors
-          let derived = { medianAverage: fallback, medianDark: fallback };
-          try {
-            derived = deriveDarkVariants(medianLight);
-          } catch (err) {
-            console.error('[deriveDarkVariants] error for', pokemonId, err);
-            derived = { medianAverage: fallback, medianDark: fallback };
-          }
-
-          backgroundColors = {
-            plainDefaultColor: fallback,
-            medianLight,
-            medianAverage: derived.medianAverage,
-            medianDark: derived.medianDark,
-          };
-        }
-        // --- END COLOR LOGIC ---
+        const existing = this.getPokemonById(id);
+        const sprites = existing != null ? existing.sprites : getSprites(id);
 
         const pokemonSpecies = await this.getPokemonSpeciesByUrl(data.species.url);
 
         const pokemonDetails = {
-          pokemonId: pokemonId,
+          id: id,
           baseExperience: data.base_experience,
           names: {
             en: data.name,
           },
           sprites,
-          backgroundColors: backgroundColors,
           types: Array.isArray(data.types) ? data.types.map((t) => t.type.name) : [],
           stats: Array.isArray(data.stats)
             ? data.stats.map((s) => ({
@@ -365,13 +195,13 @@ export const usePokemonStore = defineStore('pokemon', {
         };
 
         try {
-          await this._savePokemonDataById(pokemonId, pokemonDetails);
-        } catch (saveErr) {
-          console.error('Error saving pokemon', pokemonId, saveErr);
+          await this._savePokemonDataById(id, pokemonDetails);
+        } catch (e) {
+          console.error('Error saving pokemon', id, e);
         }
-
         return true;
       } catch (e) {
+        console.error(e);
         this.setError(e);
         return false;
       } finally {
@@ -423,9 +253,9 @@ export const usePokemonStore = defineStore('pokemon', {
           genera: data.genera,
           varieties: data.varieties,
         };
-
         return pokemonSpecies;
       } catch (e) {
+        console.error(e);
         this.setError(e);
         return false;
       } finally {

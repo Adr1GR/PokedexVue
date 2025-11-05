@@ -39,198 +39,107 @@ export function getPokemonStatColor(name) {
   return colors[name] ?? '#9CA3AF';
 }
 
-export function getPokemonTypeColor(name) {
+export function getPokemonTypeColor(nameOrId) {
+  if (nameOrId === 'normal' || nameOrId === 1) {
+    return COLOR_DEFAULT_POKEMON_TYPE_NORMAL;
+  }
+  if (nameOrId === 'fighting' || nameOrId === 2) {
+    return COLOR_DEFAULT_POKEMON_TYPE_FIGHTING;
+  }
+  if (nameOrId === 'flying' || nameOrId === 3) {
+    return COLOR_DEFAULT_POKEMON_TYPE_FLYING;
+  }
+  if (nameOrId === 'poison' || nameOrId === 4) {
+    return COLOR_DEFAULT_POKEMON_TYPE_POISON;
+  }
+  if (nameOrId === 'ground' || nameOrId === 5) {
+    return COLOR_DEFAULT_POKEMON_TYPE_GROUND;
+  }
+  if (nameOrId === 'rock' || nameOrId === 6) {
+    return COLOR_DEFAULT_POKEMON_TYPE_ROCK;
+  }
+  if (nameOrId === 'bug' || nameOrId === 7) {
+    return COLOR_DEFAULT_POKEMON_TYPE_BUG;
+  }
+  if (nameOrId === 'ghost' || nameOrId === 8) {
+    return COLOR_DEFAULT_POKEMON_TYPE_GHOST;
+  }
+  if (nameOrId === 'steel' || nameOrId === 9) {
+    return COLOR_DEFAULT_POKEMON_TYPE_STEEL;
+  }
+  if (nameOrId === 'fire' || nameOrId === 10) {
+    return COLOR_DEFAULT_POKEMON_TYPE_FIRE;
+  }
+  if (nameOrId === 'water' || nameOrId === 11) {
+    return COLOR_DEFAULT_POKEMON_TYPE_WATER;
+  }
+  if (nameOrId === 'grass' || nameOrId === 12) {
+    return COLOR_DEFAULT_POKEMON_TYPE_GRASS;
+  }
+  if (nameOrId === 'electric' || nameOrId === 13) {
+    return COLOR_DEFAULT_POKEMON_TYPE_ELECTRIC;
+  }
+  if (nameOrId === 'psychic' || nameOrId === 14) {
+    return COLOR_DEFAULT_POKEMON_TYPE_PSYCHIC;
+  }
+  if (nameOrId === 'ice' || nameOrId === 15) {
+    return COLOR_DEFAULT_POKEMON_TYPE_ICE;
+  }
+  if (nameOrId === 'dragon' || nameOrId === 16) {
+    return COLOR_DEFAULT_POKEMON_TYPE_DRAGON;
+  }
+  if (nameOrId === 'dark' || nameOrId === 17) {
+    return COLOR_DEFAULT_POKEMON_TYPE_DARK;
+  }
+  if (nameOrId === 'fairy' || nameOrId === 18) {
+    return COLOR_DEFAULT_POKEMON_TYPE_FAIRY;
+  }
+
+  return '#D1D5DB';
+}
+
+export function getColorByPokemonColorId(pokemonColorId) {
   const colors = {
-    normal: COLOR_DEFAULT_POKEMON_TYPE_NORMAL,
-    fire: COLOR_DEFAULT_POKEMON_TYPE_FIRE,
-    water: COLOR_DEFAULT_POKEMON_TYPE_WATER,
-    electric: COLOR_DEFAULT_POKEMON_TYPE_ELECTRIC,
-    grass: COLOR_DEFAULT_POKEMON_TYPE_GRASS,
-    ice: COLOR_DEFAULT_POKEMON_TYPE_ICE,
-    fighting: COLOR_DEFAULT_POKEMON_TYPE_FIGHTING,
-    poison: COLOR_DEFAULT_POKEMON_TYPE_POISON,
-    ground: COLOR_DEFAULT_POKEMON_TYPE_GROUND,
-    flying: COLOR_DEFAULT_POKEMON_TYPE_FLYING,
-    psychic: COLOR_DEFAULT_POKEMON_TYPE_PSYCHIC,
-    bug: COLOR_DEFAULT_POKEMON_TYPE_BUG,
-    rock: COLOR_DEFAULT_POKEMON_TYPE_ROCK,
-    ghost: COLOR_DEFAULT_POKEMON_TYPE_GHOST,
-    dragon: COLOR_DEFAULT_POKEMON_TYPE_DRAGON,
-    dark: COLOR_DEFAULT_POKEMON_TYPE_DARK,
-    steel: COLOR_DEFAULT_POKEMON_TYPE_STEEL,
-    fairy: COLOR_DEFAULT_POKEMON_TYPE_FAIRY,
+    0: COLOR_DEFAULT_POKEMON_COLOR_ID_RED,
+    1: COLOR_DEFAULT_POKEMON_COLOR_ID_BLUE,
+    2: COLOR_DEFAULT_POKEMON_COLOR_ID_YELLOW,
+    3: COLOR_DEFAULT_POKEMON_COLOR_ID_GREEN,
+    4: COLOR_DEFAULT_POKEMON_COLOR_ID_BLACK,
+    5: COLOR_DEFAULT_POKEMON_COLOR_ID_BROWN,
+    6: COLOR_DEFAULT_POKEMON_COLOR_ID_PURPLE,
+    7: COLOR_DEFAULT_POKEMON_COLOR_ID_GRAY,
+    8: COLOR_DEFAULT_POKEMON_COLOR_ID_WHITE,
+    9: COLOR_DEFAULT_POKEMON_COLOR_ID_PINK,
   };
-  return colors[name] ?? '#D1D5DB';
-}
-
-/**
- * AI Generated
- *
- * Extracts only the medianLight color from an image.
- * Uses aggressive downsampling and stride sampling for speed.
- *
- * @param {string} imageSrc - Image URL
- * @param {number} sampleSize - Downscale target size
- * @param {number} stride - Pixel sampling stride
- * @returns {Promise<string>} - medianLight color in 'rgb(r,g,b)' format
- */
-export async function getMedianLight(imageSrc, sampleSize = 6, stride = 2) {
-  const getLum = (r, g, b) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-  const lighten = (c, blend) => ({
-    r: c.r + (255 - c.r) * blend,
-    g: c.g + (255 - c.g) * blend,
-    b: c.b + (255 - c.b) * blend,
-  });
-  const toRgb = (c) => `rgb(${c.r | 0},${c.g | 0},${c.b | 0})`;
-
-  const fallback = COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
-
-  try {
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.crossOrigin = 'anonymous';
-      i.onload = () => resolve(i);
-      i.onerror = reject;
-      i.src = imageSrc;
-    });
-
-    const size = Math.max(2, Math.floor(sampleSize));
-    const cvs = document.createElement('canvas');
-    cvs.width = size;
-    cvs.height = size;
-    const ctx = cvs.getContext('2d', { willReadFrequently: true });
-    ctx.drawImage(img, 0, 0, size, size);
-
-    const { data } = ctx.getImageData(0, 0, size, size);
-    const s = Math.max(1, stride);
-
-    let sumR = 0,
-      sumG = 0,
-      sumB = 0,
-      count = 0;
-
-    const LIGHT_MIN = 0.28,
-      LIGHT_MAX = 0.95;
-
-    for (let y = 0; y < size; y += s) {
-      for (let x = 0; x < size; x += s) {
-        const idx = (y * size + x) * 4;
-        const r = data[idx],
-          g = data[idx + 1],
-          b = data[idx + 2],
-          a = data[idx + 3];
-        if (a === 0) continue;
-        const lum = getLum(r, g, b);
-        if (lum > LIGHT_MIN && lum < LIGHT_MAX) {
-          sumR += r;
-          sumG += g;
-          sumB += b;
-          count++;
-        }
-      }
-    }
-
-    if (count === 0) return fallback;
-
-    let base = { r: sumR / count, g: sumG / count, b: sumB / count };
-    const lumBase = getLum(base.r, base.g, base.b);
-    const MIN_LUM = 0.4;
-    if (lumBase < MIN_LUM) {
-      const blend = Math.min(0.6, ((MIN_LUM - lumBase) / MIN_LUM) * 0.6);
-      base = lighten(base, blend);
-    }
-
-    return toRgb(base);
-  } catch {
-    return fallback;
-  }
-}
-
-/**
- * AI Generated
- *
- * Derives medianAverage and medianDark from a given medianLight color.
- *
- * @param {string} medianLight - Color in 'rgb(r,g,b)' format
- * @returns {{medianAverage:string, medianDark:string}}
- */
-export function deriveDarkVariants(medianLight) {
-  const parseRgb = (rgb) => {
-    const m = rgb.match(/rgb\((\d+),(\d+),(\d+)\)/);
-    if (!m) return { r: 200, g: 200, b: 200 };
-    return { r: +m[1], g: +m[2], b: +m[3] };
-  };
-
-  const darken = (c, amount) => ({
-    r: c.r * (1 - amount),
-    g: c.g * (1 - amount),
-    b: c.b * (1 - amount),
-  });
-
-  const toRgb = (c) => `rgb(${c.r | 0},${c.g | 0},${c.b | 0})`;
-
-  const base = parseRgb(medianLight);
-  const medianAverage = darken(base, 0.18);
-  const medianDark = darken(base, 0.36);
-
-  return {
-    medianAverage: toRgb(medianAverage),
-    medianDark: toRgb(medianDark),
-  };
-}
-
-/**
- * AI Generated
- *
- * Returns true if the color requires light text for readability
- * @param {[number, number, number]} rgb - Array with red, green, blue values
- */
-export function shouldUseLightText(color) {
-  let r, g, b;
-
-  if (Array.isArray(color)) {
-    [r, g, b] = color;
-  } else if (typeof color === 'string' && color.startsWith('#')) {
-    const hex = color.replace('#', '');
-    const bigint = parseInt(hex, 16);
-    r = (bigint >> 16) & 255;
-    g = (bigint >> 8) & 255;
-    b = bigint & 255;
-  } else if (typeof color === 'string' && color.startsWith('rgb')) {
-    [r, g, b] = color.match(/\d+/g).map(Number);
-  } else {
-    return false; // fallback
-  }
-
-  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-  return lum < 0.6;
+  return colors[pokemonColorId] ?? '#D1D5DB';
 }
 
 /**
  * Returns full CSS styles for a Pokémon card or details view
  * @param {Object} params
- * @param {Object} params.pokemon - Pokémon object
  * @param {string} params.imageStyle - image style (sprite, artwork, etc.)
  * @param {string} params.backgroundStyle - background style (plain, diagonal, etc.)
- * @param {string} params.backgroundColor - background color key
+ * @param {string} params.backgroundKey - background color key
  * @returns {Object} { container, image, idColor, nameTextColor }
  */
-export function getPokemonCardStyles({ pokemon, imageStyle, backgroundStyle, backgroundColor }) {
-  const bgColor = pokemon.backgroundColors?.[backgroundColor] ?? COLOR_DEFAULT_POKEMON_BACKGROUND_FALLBACK;
+export function getPokemonCardStyles({ imageStyle, backgroundStyle, backgroundKey, secondaryBackgroundKey = null }) {
+  const bgColor = getPokemonTypeColor(backgroundKey);
   const isDiagonal = ['diagonal'].includes(backgroundStyle);
-  const isPlainDefault = ['plainDefaultColor'].includes(backgroundColor);
   const isPixelated = ['sprite', 'spriteBack', 'spriteShiny', 'spriteShinyBack', 'showdown'].includes(imageStyle);
-
+  const primaryPokemonTypeColor = getPokemonTypeColor(backgroundKey);
+  const secondaryPokemonTypeColor = secondaryBackgroundKey ? getPokemonTypeColor(backgroundKey) : null;
   return {
     container: {
       background: isDiagonal ? `linear-gradient(135deg, rgb(245,245,245) 50%, ${bgColor} 50%)` : bgColor,
-      boxShadow: isPlainDefault ? '0 0 12px 1.5px black' : `0 0 12px 1.5px ${bgColor}`,
-      borderColor: isPlainDefault ? 'black' : bgColor,
+      boxShadow: `0 0 3px 0.5px ${bgColor}`,
     },
     image: {
       imageRendering: isPixelated ? 'pixelated' : 'auto',
     },
-    idColor: isPlainDefault ? COLOR_DEFAULT_POKEMON_ID_FALLBACK : bgColor,
-    nameTextColor: shouldUseLightText(bgColor) ? 'white' : 'black',
+    idColor: bgColor,
+    typesColors: {
+      primary: primaryPokemonTypeColor,
+      secondary: secondaryPokemonTypeColor
+    }
   };
 }

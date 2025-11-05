@@ -1,7 +1,6 @@
 export function showErrorPopup(e, additionalText) {
   const text = String(e ?? "Unknown Error");
   const fullText = additionalText ? `${text} --- ${additionalText}` : text;
-  console.log(fullText);
   const ID = "__error_popup__";
 
   let existing = document.getElementById(ID);
@@ -30,7 +29,6 @@ export function showErrorPopup(e, additionalText) {
   copyHint.className = "error-popup__hint";
   copyHint.textContent = "Click to copy";
 
-  // referencias para reinicio/timers
   wrap._content = content;
   wrap._copyHint = copyHint;
 
@@ -56,7 +54,8 @@ export function showErrorPopup(e, additionalText) {
       copyHint.style.opacity = "1";
       clearTimeout(wrap._hideTimer);
       wrap._hideTimer = setTimeout(() => removePopup(wrap), 700);
-    } catch (err) {
+    } catch (e) {
+      console.error(e);
       copyHint.textContent = "Failed to copy";
       clearTimeout(wrap._hideTimer);
       wrap._hideTimer = setTimeout(() => removePopup(wrap), 1200);
@@ -64,8 +63,7 @@ export function showErrorPopup(e, additionalText) {
   });
 
   document.body.appendChild(wrap);
-  // force reflow for transition (same intent as previous)
-  /* eslint-disable no-unused-expressions */
+
   wrap.getBoundingClientRect();
 
   wrap._hideTimer = setTimeout(() => removePopup(wrap), 5000);

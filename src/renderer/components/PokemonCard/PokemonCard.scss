@@ -1,10 +1,51 @@
-@use '../../variables.scss'as vars;
+@use '../../variables.scss' as vars;
+
+.pokemon-card-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 24rem;
+  border-width: 1px;
+  border-radius: 6px;
+}
+
+.pokemon-card-details-link {
+  z-index: 20;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0rem;
+  left: 0rem;
+}
+
+.image-wrapper {
+  position: relative;
+  height: 11rem; //this is what is squizing the cards
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.pokemon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 .pokemon-card-name {
   font-family: 'SimplyRounded', sans-serif;
   font-size: 2rem;
   color: vars.$secondary-text-color;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7); // sombra más difuminada
+  color: white;
+  position: absolute;
+  bottom: 0rem;
+  right: 0rem;
+  text-align: right;
+  padding-right: 0.75rem;
+  padding-bottom: 0.25rem;
+  text-transform: capitalize;
 
   @media (max-width: 1024px) {
     font-size: 1.5rem;
@@ -16,10 +57,15 @@
   font-family: 'SimplyRounded', sans-serif;
   font-size: 1.5rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 0rem;
+  left: 0rem;
+  text-align: left;
+  padding-left: 0.75rem;
+  padding-top: 0.25rem;
 
   @media (max-width: 1024px) {
     font-size: 1rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-
   }
 }

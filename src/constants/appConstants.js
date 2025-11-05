@@ -1,20 +1,20 @@
 /* URLs */
 export const URL_POKEAPI_BASE = 'https://pokeapi.co/api/v2/';
 export const URL_SPRITES_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/';
+export const URL_POKEMON_DATA = 'https://raw.githubusercontent.com/Adr1GR/PokedexVueData/main/pokemons.json'
 export const URL_CHECK_INTERNET_CONNECTION = 'https://www.google.com/favicon.ico';
 export const URL_APP_REPOSITORY = 'https://github.com/Adr1GR/PokedexVue';
 export const URL_APP_DOWNLOADS = 'https://github.com/Adr1GR/PokedexVue/releases/latest';
 
 /** Stores Keys */
-export const STORE_KEY_POKEMON = 'pokemon-store-v3';
-export const STORE_KEY_APP_SETTINGS = 'app-settings-v1';
+export const STORE_KEY_POKEMON = 'pokemon-store-v4';
+export const STORE_KEY_APP_SETTINGS = 'app-settings-v2';
 
 /* ====== App Settings options ====== */
 
 // ---- user-visible settings
-export const SETTINGS_OPTIONS_APP_LANGUAGES = ['en', 'es'];
-export const SETTINGS_OPTIONS_APP_THEMES = ['light', 'dark'];
-
+export const SETTINGS_OPTIONS_APP_LANGUAGES = ['en'];
+export const SETTINGS_OPTIONS_APP_THEMES = ['light']
 // ---- data & misc
 export const SETTINGS_OPTIONS_POKEMON_DATA_REFRESH_RATES = [1, 7, 15, 30, 'never'];
 
@@ -30,16 +30,7 @@ export const SETTINGS_OPTIONS_POKEMON_LIST_IMAGE_STYLES = [
   'homeShiny',
   'showdown',
 ];
-
 export const SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_STYLES = ['diagonal', 'fullCover'];
-
-export const SETTINGS_OPTIONS_POKEMON_LIST_BACKGROUND_COLORS = [
-  'plainDefaultColor',
-  'medianLight',
-  'medianAverage',
-  'medianDark',
-];
-
 export const SETTINGS_OPTIONS_POKEMON_LIST_LOAD_MORE_QUANTITY = [12, 30, 48];
 
 // ---- details page settings
@@ -54,17 +45,8 @@ export const SETTINGS_OPTIONS_POKEMON_DETAILS_IMAGE_STYLES = [
   'homeShiny',
   'showdown',
 ];
-
 export const SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_STYLES = ['diagonal', 'fullCover'];
-
-export const SETTINGS_OPTIONS_POKEMON_DETAILS_BACKGROUND_COLORS = [
-  'plainDefaultColor',
-  'medianLight',
-  'medianAverage',
-  'medianDark',
-];
-
-export const SETTINGS_OPTIONS_POKEMON_DETAILS_PAGE_STYLES = ['default', 'simple'];
+export const SETTINGS_OPTIONS_POKEMON_DETAILS_PAGE_STYLES = ['default'];
 
 /** ====== App Settings Default Options ====== */
 
@@ -76,20 +58,16 @@ export const DEFAULT_OPTION_APP_THEMES = 'light';
 export const DEFAULT_OPTION_POKEMON_DATA_REFRESH_RATES = 7;
 
 // ---- list/card settings
-export const DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES = 'officialArtwork';
+export const DEFAULT_OPTION_POKEMON_LIST_IMAGE_STYLES = 'sprite';
 
 export const DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_STYLES = 'diagonal';
-
-export const DEFAULT_OPTION_POKEMON_LIST_BACKGROUND_COLORS = 'medianLight';
 
 export const DEFAULT_OPTION_POKEMON_LIST_LOAD_MORE_QUANTITY = 12;
 
 // ---- details page settings
-export const DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES = 'officialArtwork';
+export const DEFAULT_OPTION_POKEMON_DETAILS_IMAGE_STYLES = 'sprite';
 
 export const DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_STYLES = 'diagonal';
-
-export const DEFAULT_OPTION_POKEMON_DETAILS_BACKGROUND_COLORS = 'medianLight';
 
 export const DEFAULT_OPTION_POKEMON_DETAILS_PAGE_STYLES = 'default';
 

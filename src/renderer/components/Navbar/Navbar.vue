@@ -16,13 +16,6 @@
     >
       <span class="navbar-links">Settings</span>
     </RouterLink>
-    <!-- <a
-      class="flex-1 flex flex-col items-center justify-center"
-      :href="URL_APP_DOWNLOADS"
-      target="_blank"
-    >
-      <span class="navbar-links">Downloads</span>
-    </a> -->
   </nav>
 
   <!-- Navbar escritorio -->
