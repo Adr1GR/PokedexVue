@@ -30,6 +30,7 @@ export const usePokemonStore = defineStore('pokemon', {
     pokemons: {},
     loading: false,
     error: null,
+    savedPokemonList: false
   }),
   getters: {
     total: (state) => Object.keys(state.pokemons).length,
@@ -98,14 +99,25 @@ export const usePokemonStore = defineStore('pokemon', {
       this.error = null;
     },
 
-    async getAllPokemonsList() {
+    async fetchAndSaveAllPokemonsList() {
       this.loading = true;
       try {
         const data = await fetch(POKEMON_DATA)
           .then((response) => response.json())
           .catch((e) => console.error('Error fetching JSON: ', e));
-        this.loading = false;
-        return data;
+        data.forEach(async (p) => {
+          const pokemonListFormat = {
+            sprites: getSprites(p.id),
+            pokemon_list_format: p,
+          };
+          try {
+            await this._savePokemonDataById(p.id, pokemonListFormat);
+            this.loading = false;
+          } catch (e) {
+            console.error('Error saving pokemon', p.id, e);
+          }
+        });
+      this.savedPokemonList = true;
       } catch (e) {
         console.error(e);
         this.setError(e);
@@ -138,9 +150,13 @@ export const usePokemonStore = defineStore('pokemon', {
         const sprites = existing != null ? existing.sprites : getSprites(id);
 
         const pokemonSpecies = await this.getPokemonSpeciesByUrl(data.species.url);
+        const pokemonLocationAreaEncounters = await this.getPokemonLocationAreaEncountersByUrl(
+          data.location_area_encounters
+        );
 
         const pokemonDetails = {
           id: id,
+          pokemon_list_format: existing.pokemon_list_format,
           baseExperience: data.base_experience,
           names: {
             en: data.name,
@@ -182,7 +198,7 @@ export const usePokemonStore = defineStore('pokemon', {
                 versionDetails: h.version_details,
               }))
             : [],
-          locationAreaEncounters: data.location_area_encounters,
+          locationAreaEncounters: pokemonLocationAreaEncounters,
           moves: Array.isArray(data.moves)
             ? data.moves.map((m) => ({
                 move: m.move,
@@ -252,6 +268,26 @@ export const usePokemonStore = defineStore('pokemon', {
           formDescriptions: data.form_descriptions,
           genera: data.genera,
           varieties: data.varieties,
+        };
+        return pokemonSpecies;
+      } catch (e) {
+        console.error(e);
+        this.setError(e);
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getPokemonLocationAreaEncountersByUrl(url) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const pokemonSpecies = {
+          id: data.id,
+          
         };
         return pokemonSpecies;
       } catch (e) {
