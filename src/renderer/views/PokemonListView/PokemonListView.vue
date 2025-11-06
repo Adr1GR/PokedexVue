@@ -9,8 +9,7 @@
       v-if="showError"
       class="secondary-text-color secondary-background-color fixed inset-x-0 bottom-20 sm:bottom-80 z-50 p-4 flex items-center justify-between mx-0 xs:mx-20 sm:mx-40 md:mx-60 lg:mx-80 xl:mx-100 cursor-pointer"
       role="alert"
-    >
-    </div>
+    ></div>
   </div>
 </template>
 
@@ -30,11 +29,12 @@ let dataReady = ref(false);
 let pokemons = ref([]);
 
 onMounted(async () => {
-  pokemons.value = await pokemonStore.getAllPokemonsList(pokemons);
-  pokemonStore.addImageUrlToPokemons(pokemons.value);
+  if (!pokemonStore.savedPokemonList) {
+    await pokemonStore.fetchAndSaveAllPokemonsList(pokemons.value);
+  }
+  pokemons.value = await pokemonStore.getAllPokemons;
   dataReady.value = true;
 });
-
 </script>
 
 <style></style>

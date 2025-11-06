@@ -1,6 +1,6 @@
 <template>
   <div ref="container" :style="styles.container" class="pokemon-card-container">
-    <RouterLink class="pokemon-card-details-link" :to="{ name: 'pokemon-details', params: { id: pokemon.id } }" />
+    <RouterLink class="pokemon-card-details-link" :to="{ name: 'pokemon-details', params: { id: pokemon.pokemon_list_format.id } }" />
     <div class="image-wrapper">
       <img
         v-if="visible && pokemon"
@@ -16,10 +16,10 @@
         style="will-change: opacity, filter"
         @load="imageLoaded = true"
       />
-      <div class="pokemon-card-id" :style="{ color: styles.idColor }">#{{ pokemon.id }}</div>
+      <div class="pokemon-card-id" :style="{ color: styles.idColor }">#{{ pokemon.pokemon_list_format.id }}</div>
       <div>
         <span class="pokemon-card-name">
-          {{ pokemon.identifier }}
+          {{ pokemon.pokemon_list_format.identifier }}
         </span>
       </div>
     </div>
@@ -42,7 +42,9 @@ const settingCardBackgroundStyle = appSettingsStore.pokemonList.cardBackgroundSt
 
 const props = defineProps({ pokemon: Object });
 const pokemon = ref(props.pokemon);
-const pokemonImage = ref(pokemonStore.getImageUrlFromPokemon(pokemon.value.id, settingCardImageStyle));
+
+const pokemonImage = ref(pokemon.value.sprites[settingCardImageStyle]);
+
 
 const container = ref(null);
 const visible = ref(false);
@@ -55,7 +57,7 @@ const styles = computed(() =>
   getPokemonCardStyles({
     imageStyle: settingCardImageStyle,
     backgroundStyle: settingCardBackgroundStyle,
-    backgroundKey: pokemon.value.type_id_1,
+    backgroundKey: pokemon.value.pokemon_list_format.type_id_1,
   })
 );
 

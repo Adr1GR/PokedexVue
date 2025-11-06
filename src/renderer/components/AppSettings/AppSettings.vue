@@ -25,7 +25,7 @@
     </section>
 
     <!-- Data -->
-    <section class="settings-select shadow">
+    <section class="settings-section shadow">
       <h2 class="medium-title">Data</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col">
@@ -40,7 +40,7 @@
     </section>
 
     <!-- Pokemon list -->
-    <section class="settings-select shadow">
+    <section class="settings-section shadow">
       <h2 class="medium-title">Pokemon list</h2>
       <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <label class="flex flex-col md:col-span-1">
@@ -75,7 +75,7 @@
     </section>
 
     <!-- Pokemon details -->
-    <section class="settings-select shadow">
+    <section class="settings-section shadow">
       <h2 class="medium-title">Pokemon details</h2>
 
       <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
